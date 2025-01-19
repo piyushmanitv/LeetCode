@@ -1,0 +1,56 @@
+Trapping Rain Water II
+
+
+
+
+Given an m x n integer matrix heightMap representing the height of each unit cell in a 2D elevation map, return the volume of water it can trap after raining.
+
+
+
+
+
+
+
+
+class Solution {
+public:
+    int trapRainWater(vector<vector<int>>& map) {
+        int n=map.size(), m=map[0].size();
+        vector<vector<int>> vis(n, (vector<int> (m,0)));
+        using tup = tuple<int, int, int>;// hieght, row, col
+
+        priority_queue<tup, vector<tup>, greater<tup>> pq;
+        for(int i=0;i<m;i++){
+            pq.emplace(map[0][i], 0, i);
+            pq.emplace(map[n-1][i], n-1, i);
+            vis[0][i]=1;
+            vis[n-1][i]=1;
+        }
+
+        for(int i=1;i<n-1;i++){
+            pq.emplace(map[i][0], i, 0);
+            pq.emplace(map[i][m-1], i, m-1);
+            vis[i][0]=1;
+            vis[i][m-1]=1;
+        }
+
+        int dir[] ={-1,0,1,0,-1};
+        int water=0;
+        while(!pq.empty()){
+            auto [currh, i, j] = pq.top();
+            pq.pop();
+
+            for(int k=0;k<4;k++){
+                int ni=i+dir[k];
+                int nj=j+dir[k+1];
+
+                if(ni<0 || nj<0 || ni>=n || nj>=m || vis[ni][nj]) continue;
+
+                vis[ni][nj]=1;
+                water += max(0, currh-map[ni][nj]);
+                pq.emplace(max(currh, map[ni][nj]), ni, nj);
+            }
+        }
+        return water;
+    }
+};
