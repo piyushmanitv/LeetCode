@@ -1,0 +1,49 @@
+First Completely Painted Row or Column
+
+
+
+
+
+You are given a 0-indexed integer array arr, and an m x n integer matrix mat. arr and mat both contain all the integers in the range [1, m * n].
+
+Go through each index i in arr starting from index 0 and paint the cell in mat containing the integer arr[i].
+
+Return the smallest index i at which either a row or a column will be completely painted in mat.
+
+
+
+
+
+
+class Solution {
+public:
+    int firstCompleteIndex(vector<int>& arr, vector<vector<int>>& mat) {
+        int rows = mat.size();
+        int cols = mat[0].size();
+
+        unordered_map<int, pair<int, int>> ump;  // val, row, col
+        vector<int> row_cnt(rows);
+        vector<int> col_cnt(cols);
+        
+        for(int r=0; r<rows; r++){
+            for(int c=0; c<cols; c++){
+                int val = mat[r][c];
+                ump[val] = {r, c};
+            }
+        }
+
+        for(int i=0; i<arr.size(); i++){
+            int num = arr[i];
+            auto [r, c] = ump[num];
+            
+            row_cnt[r]++;
+            col_cnt[c]++;
+
+            if(row_cnt[r] == cols || col_cnt[c] == rows){
+                return i;
+            }
+        }
+
+        return -1;
+    }
+};
