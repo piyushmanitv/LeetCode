@@ -1,0 +1,76 @@
+802. Find Eventual Safe States
+
+
+
+
+There is a directed graph of n nodes with each node labeled from 0 to n - 1. The graph is represented by a 0-indexed 2D integer array graph where graph[i] is an integer array of nodes adjacent to node i, meaning there is an edge from node i to each node in graph[i].
+
+A node is a terminal node if there are no outgoing edges. A node is a safe node if every possible path starting from that node leads to a terminal node (or another safe node).
+
+Return an array containing all the safe nodes of the graph. The answer should be sorted in ascending order.
+
+
+
+
+
+
+
+
+
+class Solution {
+public:
+    vector<int> eventualSafeNodes(vector<vector<int>>& graph) {
+        // Lazy initialization of safeNodes to mimic Java's behavior.
+        if (!initialized) {
+            init(graph);
+        }
+        return safeNodes;
+    }
+
+private:
+    vector<int> safeNodes;
+    bool initialized = false;
+
+    void init(vector<vector<int>>& graph) {
+        if (initialized) return; // Prevent re-initialization
+
+        int n = graph.size();
+        vector<vector<int>> reverseAdj(n); // Reverse adjacency list
+        vector<int> inDegree(n, 0);        // Store in-degrees of nodes
+
+        // Build reverse adjacency list and compute in-degrees
+        for (int i = 0; i < n; i++) {
+            for (int neighbor : graph[i]) {
+                reverseAdj[neighbor].push_back(i);
+                inDegree[i]++;
+            }
+        }
+
+        // Queue for nodes with in-degree 0
+        queue<int> q;
+        for (int i = 0; i < n; i++) {
+            if (inDegree[i] == 0) {
+                q.push(i);
+            }
+        }
+
+        // Topological sort to identify safe nodes
+        while (!q.empty()) {
+            int safeNode = q.front();
+            q.pop();
+            safeNodes.push_back(safeNode);
+
+            for (int neighbor : reverseAdj[safeNode]) {
+                inDegree[neighbor]--;
+                if (inDegree[neighbor] == 0) {
+                    q.push(neighbor);
+                }
+            }
+        }
+
+        // Sort safe nodes for the final result
+        sort(safeNodes.begin(), safeNodes.end());
+        initialized = true;
+
+    }
+};
