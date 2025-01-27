@@ -1,0 +1,70 @@
+1462. Course Schedule IV
+
+
+
+
+
+
+There are a total of numCourses courses you have to take, labeled from 0 to numCourses - 1.
+You are given an array prerequisites where prerequisites[i] = [ai, bi] indicates that you 
+must take course ai first if you want to take course bi.
+
+For example, the pair [0, 1] indicates that you have to take course 0 before you can take 
+course 1.
+Prerequisites can also be indirect. If course a is a prerequisite of course b, and course b 
+is a prerequisite of course c, then course a is a prerequisite of course c.
+
+You are also given an array queries where queries[j] = [uj, vj]. For the jth query, you 
+should answer whether course uj is a prerequisite of course vj or not.
+
+Return a boolean array answer, where answer[j] is the answer to the jth query.
+
+
+
+
+
+
+
+
+class Solution {
+public:
+    int n;
+    bitset<100> path[100]; // Store prerequisite relationships
+    vector<int> adj[100];  // Adjacency list for the graph
+
+    void dfs(int start, int i, bitset<100>& visited) {
+        visited[i] = 1;     // Mark as visited
+        path[start][i] = 1; // path from start to i
+        for (int j : adj[i]) {
+            if (visited[j]) {
+                path[i] |= path[j];
+                continue;
+            }
+            dfs(start, j, visited);
+        }
+    }
+
+    vector<bool> checkIfPrerequisite(int n, vector<vector<int>>& prerequisites,
+                                     vector<vector<int>>& queries) {
+        this->n = n;
+
+        // Build the graph and initialize prerequisites
+        for (auto& edge : prerequisites) {
+            int u = edge[0], v = edge[1];
+            adj[u].push_back(v);
+        }
+
+        // Perform DFS from each node
+        for (int i = 0; i < n; i++) {
+            bitset<100> visited;
+            if (!visited[i])
+                dfs(i, i, visited); // Start DFS from node i
+        }
+
+        const int m = queries.size();
+        vector<bool> ans(m, 0);
+        for (int i = 0; i < m; i++)
+            ans[i] = path[queries[i][0]][queries[i][1]];
+        return ans;
+    }
+};
