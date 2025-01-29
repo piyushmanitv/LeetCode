@@ -1,0 +1,52 @@
+684. Redundant Connection
+
+
+
+
+
+In this problem, a tree is an undirected graph that is connected and has no cycles.
+
+You are given a graph that started as a tree with n nodes labeled from 1 to n, with
+one additional edge added. The added edge has two different vertices chosen from 1 to n,
+and was not an edge that already existed. The graph is represented as an array edges of 
+length n where edges[i] = [ai, bi] indicates that there is an edge between nodes ai and 
+bi in the graph.
+
+Return an edge that can be removed so that the resulting graph is a tree of n nodes. If
+there are multiple answers, return the answer that occurs last in the input.
+
+
+
+
+class Solution {
+public:
+    vector<int> findRedundantConnection(vector<vector<int>>& edges) {
+        int n = edges.size();
+        vector<int> parent(n + 1), rank(n + 1, 1);
+
+        // Initialize each node as its own parent
+        for (int i = 1; i <= n; i++) parent[i] = i;
+
+        // Find function with path compression
+        function<int(int)> find = [&](int node) {
+            return parent[node] == node ? node : parent[node] = find(parent[node]);
+        };
+
+        // Union function with union by rank
+        auto unite = [&](int a, int b) {
+            int pa = find(a), pb = find(b);
+            if (pa == pb) return false; // Cycle detected
+            if (rank[pa] > rank[pb]) swap(pa, pb);
+            parent[pa] = pb;
+            if (rank[pa] == rank[pb]) rank[pb]++;
+            return true;
+        };
+
+        // Process edges and return the last one that forms a cycle
+        for (auto &edge : edges) {
+            if (!unite(edge[0], edge[1])) return edge;
+        }
+
+        return {};
+    }
+};
