@@ -1,0 +1,119 @@
+2493. Divide Nodes Into the Maximum Number of Groups
+
+
+
+
+
+You are given a positive integer n representing the number of nodes 
+in an undirected graph. The nodes are labeled from 1 to n.
+
+You are also given a 2D integer array edges, where edges[i] = [ai, bi] 
+indicates that there is a bidirectional edge between nodes ai and bi. 
+Notice that the given graph may be disconnected.
+
+Divide the nodes of the graph into m groups (1-indexed) such that:
+
+Each node in the graph belongs to exactly one group.
+For every pair of nodes in the graph that are connected by an edge [ai, bi], 
+if ai belongs to the group with index x, and bi belongs to the group with 
+index y, then |y - x| = 1.
+Return the maximum number of groups (i.e., maximum m) into which you can divide
+the nodes. Return -1 if it is impossible to group the nodes with the given conditions.
+
+
+
+
+
+
+
+
+
+class Solution {
+public:
+    int magnificentSets(int n, vector<vector<int>>& edges) {
+        vector<vector<int>> adj(n + 1);
+        for (auto& e : edges) {
+            adj[e[0]].push_back(e[1]);
+            adj[e[1]].push_back(e[0]);
+        }
+
+        vector<int> color(n + 1, 0); // 0: unvisited, 1: color1, -1: color2
+        vector<int> visited(n + 1, 0);
+
+        function<bool(int, int)> isBipartite = [&](int node, int c) {
+            queue<int> q;
+            q.push(node);
+            color[node] = c;
+
+            while (!q.empty()) {
+                int curr = q.front();
+                q.pop();
+                for (int nei : adj[curr]) {
+                    if (color[nei] == 0) {
+                        color[nei] = -color[curr];
+                        q.push(nei);
+                    } else if (color[nei] == color[curr]) {
+                        return false; // Not bipartite
+                    }
+                }
+            }
+            return true;
+        };
+
+        function<int(int)> bfsDepth = [&](int start) {
+            queue<int> q;
+            unordered_map<int, int> depth;
+            q.push(start);
+            depth[start] = 1;
+
+            int maxDepth = 1;
+            while (!q.empty()) {
+                int node = q.front();
+                q.pop();
+                for (int nei : adj[node]) {
+                    if (!depth.count(nei)) {
+                        depth[nei] = depth[node] + 1;
+                        maxDepth = max(maxDepth, depth[nei]);
+                        q.push(nei);
+                    }
+                }
+            }
+            return maxDepth;
+        };
+
+        int maxGroups = 0;
+        for (int i = 1; i <= n; i++) {
+            if (!visited[i]) {
+                vector<int> component;
+                queue<int> q;
+                q.push(i);
+                visited[i] = 1;
+
+                while (!q.empty()) {
+                    int node = q.front();
+                    q.pop();
+                    component.push_back(node);
+                    for (int nei : adj[node]) {
+                        if (!visited[nei]) {
+                            visited[nei] = 1;
+                            q.push(nei);
+                        }
+                    }
+                }
+
+                // Check if the component is bipartite
+                if (!isBipartite(component[0], 1)) return -1;
+
+                // Get the max BFS depth from any node in this component
+                int maxDepth = 0;
+                for (int node : component) {
+                    maxDepth = max(maxDepth, bfsDepth(node));
+                }
+
+                maxGroups += maxDepth;
+            }
+        }
+
+        return maxGroups;
+    }
+};
