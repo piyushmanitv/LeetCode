@@ -1,0 +1,47 @@
+10. Regular Expression Matching
+
+
+
+
+
+
+Given an input string s and a pattern p, implement 
+regular expression matching with support for '.' and '*' where:
+
+'.' Matches any single character.​​​​
+'*' Matches zero or more of the preceding element.
+The matching should cover the entire input string (not partial).
+
+
+
+
+
+
+#include <unordered_map>
+
+class Solution {
+public:
+    bool isMatch(string s, string p) {
+        return dp(0, 0, s, p);
+    }
+
+private:
+    unordered_map<int, bool> memo;
+
+    bool dp(int i, int j, string& s, string& p) {
+        int key = i * 1000 + j; // Unique key for memoization
+        if (memo.count(key)) return memo[key];
+
+        if (j == p.size()) return i == s.size();
+
+        bool match = (i < s.size() && (s[i] == p[j] || p[j] == '.'));
+
+        if (j + 1 < p.size() && p[j + 1] == '*') {
+            // Case 1: Ignore '*'
+            // Case 2: Use '*' if the preceding character matches
+            return memo[key] = (dp(i, j + 2, s, p) || (match && dp(i + 1, j, s, p)));
+        }
+
+        return memo[key] = match && dp(i + 1, j + 1, s, p);
+    }
+};
