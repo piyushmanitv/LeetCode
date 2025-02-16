@@ -1,0 +1,67 @@
+32. Longest Valid Parentheses
+
+
+
+
+Given a string containing just the characters '(' and ')', 
+return the length of the longest valid (well-formed) parentheses 
+substring.
+
+
+
+
+
+
+class Solution {
+ public:
+  int longestValidParentheses(string s) {
+    const string s2 = ")" + s;
+    // dp[i] := the length of the longest valid parentheses in the substring
+    // s2[1..i]
+    vector<int> dp(s2.length());
+
+    for (int i = 1; i < s2.length(); ++i)
+      if (s2[i] == ')' && s2[i - dp[i - 1] - 1] == '(')
+        dp[i] = dp[i - 1] + dp[i - dp[i - 1] - 2] + 2;
+
+    return ranges::max(dp);
+  }
+};
+
+
+
+
+
+another solution 
+
+
+
+
+class Solution {
+public:
+    int longestValidParentheses(string s) {
+        int left = 0, right = 0, maxLen = 0;
+
+        // Left to Right Scan
+        for (char c : s) {
+            if (c == '(') left++;
+            else right++;
+
+            if (left == right) maxLen = max(maxLen, 2 * right);
+            else if (right > left) left = right = 0;
+        }
+
+        left = right = 0;
+
+        // Right to Left Scan
+        for (int i = s.length() - 1; i >= 0; i--) {
+            if (s[i] == ')') right++;
+            else left++;
+
+            if (left == right) maxLen = max(maxLen, 2 * left);
+            else if (left > right) left = right = 0;
+        }
+
+        return maxLen;
+    }
+};
