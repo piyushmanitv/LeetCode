@@ -1,0 +1,70 @@
+30. Substring with Concatenation of All Words
+
+
+
+
+You are given a string s and an array of strings words. All the 
+strings of words are of the same length.
+
+A concatenated string is a string that exactly contains all the 
+strings of any permutation of words concatenated.
+
+For example, if words = ["ab","cd","ef"], then "abcdef", "abefcd", 
+"cdabef", "cdefab", "efabcd", and "efcdab" are all concatenated 
+strings. "acdbef" is not a concatenated string because it is not 
+the concatenation of any permutation of words.
+Return an array of the starting indices of all the concatenated 
+substrings in s. You can return the answer in any order.
+
+
+
+
+
+
+
+
+//Optimized Solution
+class Solution {
+public:
+    vector<int> findSubstring(string s, vector<string>& words) {
+
+        unordered_map<string, int> map, freq;
+        for(string word : words) {
+            map[word]++;
+        }
+
+        int len = words[0].size();
+        vector<int> res;
+
+        for (int i = 0; i < len; i++) { 
+            int right = i, left = i;
+            while(right < s.size()) {
+                string str = s.substr(right, len);
+
+                if(map.find(str) == map.end()) {
+                    right += len;
+                    left = right;
+                    freq.clear();
+                    continue;
+                }
+
+                freq[str]++;
+
+                while(left < right && freq[str] > map[str]) {
+                    string wrd = s.substr(left, len);
+                    freq[wrd]--;
+                    left += len;
+                }
+
+                if(freq == map) {
+                    res.push_back(left);
+                }
+
+                right += len;
+            }
+            freq.clear();
+        }
+
+        return res;
+    }
+};
