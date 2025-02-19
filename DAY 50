@@ -1,0 +1,46 @@
+1415. The k-th Lexicographical String of All Happy Strings of Length n
+
+
+
+
+
+
+A happy string is a string that:
+
+consists only of letters of the set ['a', 'b', 'c'].
+s[i] != s[i + 1] for all values of i from 1 to s.length - 1 
+(string is 1-indexed).
+For example, strings "abc", "ac", "b" and "abcbabcbcb" are all
+happy strings and strings "aa", "baa" and "ababbc" are not happy strings.
+
+Given two integers n and k, consider a list of all happy strings 
+of length n sorted in lexicographical order.
+
+Return the kth string of this list or return an empty string if 
+there are less than k happy strings of length n.
+
+
+
+
+
+
+
+
+
+class Solution {
+public:
+    string getHappyString(int n, int k) {
+        int sz=3*(1<<(n-1));
+        if (k>sz) return "";
+        auto [q, r]=div(k-1, 1<<(n-1));// k-1
+        string s(n, ' ');
+        s[0]='a'+q;
+        bitset<9> bin(r);
+        array<char, 2> xx[3]={{'b', 'c'}, {'a', 'c'}, {'a', 'b'}};
+        for(int i=n-2; i>=0; i--){
+            char idx=s[n-2-i]-'a';
+            s[n-1-i]=(bin[i])?xx[idx][1]:xx[idx][0];
+        }
+        return s;
+    }
+};
