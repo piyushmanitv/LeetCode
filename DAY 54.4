@@ -1,0 +1,106 @@
+2034. Stock Price Fluctuation 
+
+
+
+
+You are given a stream of records about a particular stock. Each record 
+
+contains a timestamp and the corresponding price of the stock at that timestamp.
+
+Unfortunately due to the volatile nature of the stock market, the records 
+do not come in order. Even worse, some records may be incorrect. Another 
+record with the same timestamp may appear later in the stream correcting 
+the price of the previous wrong record.
+
+Design an algorithm that:
+
+Updates the price of the stock at a particular timestamp, correcting the price
+from any previous records at the timestamp.
+Finds the latest price of the stock based on the current records. The latest 
+price is the price at the latest timestamp recorded.
+Finds the maximum price the stock has been based on the current records.
+Finds the minimum price the stock has been based on the current records.
+Implement the StockPrice class:
+
+StockPrice() Initializes the object with no price records.
+void update(int timestamp, int price) Updates the price of the stock at the
+given timestamp.
+int current() Returns the latest price of the stock.
+int maximum() Returns the maximum price of the stock.
+int minimum() Returns the minimum price of the stock.
+
+
+
+
+
+
+
+
+
+
+class StockPrice {
+public:
+
+    priority_queue<pair<int, int>, vector<pair<int, int>>, std::greater<pair<int, int>>> minQ;
+
+    priority_queue<pair<int, int>> maxQ;
+    unordered_map<int, int> timestampToStockPrice;
+
+    int latest=-1;
+    
+    StockPrice() {
+
+    }
+    
+    void update(int timestamp, int price) {
+        if(timestamp > latest) {
+            latest = timestamp;
+        }
+
+
+        timestampToStockPrice[timestamp] = price;
+        maxQ.push({price, timestamp});
+        minQ.push({price, timestamp});
+    }
+    
+    int current() {
+        if(latest == -1) {
+            return 0;
+        }
+        return timestampToStockPrice[latest];
+    }
+    
+    int maximum() {
+        while(!maxQ.empty() && timestampToStockPrice[maxQ.top().second] != maxQ.top().first) {
+            maxQ.pop();
+        }
+
+        return maxQ.top().first;
+    }
+    
+    int minimum() {
+        while(!minQ.empty() && timestampToStockPrice[minQ.top().second] != minQ.top().first) {
+            minQ.pop();
+        }
+
+        return minQ.top().first;
+    }
+};
+
+/**
+ * Your StockPrice object will be instantiated and called as such:
+ * StockPrice* obj = new StockPrice();
+ * obj->update(timestamp,price);
+ * int param_2 = obj->current();
+ * int param_3 = obj->maximum();
+ * int param_4 = obj->minimum();
+ */
+
+/**
+ * Your StockPrice object will be instantiated and called as such:
+ * StockPrice* obj = new StockPrice();
+ * obj->update(timestamp,price);
+ * int param_2 = obj->current();
+ * int param_3 = obj->maximum();
+ * int param_4 = obj->minimum();
+ */
