@@ -1,0 +1,49 @@
+3462. Maximum Sum With at Most K Elements
+
+
+
+
+
+
+
+
+
+
+You are given a 2D integer matrix grid of size n x m, an integer array 
+limits of length n, and an integer k. The task is to find the maximum sum
+of at most k elements from the matrix grid such that:
+
+The number of elements taken from the ith row of grid does not exceed limits[i].
+
+Return the maximum sum.
+
+
+
+
+
+
+
+
+
+
+
+
+
+class Solution {
+public:
+    long long maxSum(vector<vector<int>>& grid, vector<int>& limits, int k) {
+        priority_queue<int> pq;
+        for (int i = 0; i < grid.size(); i++) {
+            nth_element(grid[i].begin(), grid[i].begin() + limits[i], grid[i].end(),greater<int>());
+            for (int j = 0; j < limits[i]; j++) {
+                pq.push(grid[i][j]);
+            }
+        }
+        long long sum = 0;
+        while (k-- && !pq.empty()) {
+            sum += pq.top();
+            pq.pop();
+        }
+        return sum;
+    }
+};
