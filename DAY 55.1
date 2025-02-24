@@ -1,0 +1,58 @@
+95. Unique Binary Search Trees II
+
+
+
+
+
+Given an integer n, return all the structurally unique BST's (binary search trees), 
+which has exactly n nodes of unique values from 1 to n. Return the answer in any order.
+
+
+
+
+
+
+/**
+ * Definition for a binary tree node.
+ * struct TreeNode {
+ *     int val;
+ *     TreeNode *left;
+ *     TreeNode *right;
+ *     TreeNode() : val(0), left(nullptr), right(nullptr) {}
+ *     TreeNode(int x) : val(x), left(nullptr), right(nullptr) {}
+ *     TreeNode(int x, TreeNode *left, TreeNode *right) : val(x), left(left), right(right) {}
+ * };
+ */
+class Solution {
+    TreeNode* cloneWithOffset(TreeNode* root, int offset) {
+        if (!root) return nullptr;
+        TreeNode* newRoot = new TreeNode(root->val + offset);
+        newRoot->left = cloneWithOffset(root->left, offset);
+        newRoot->right = cloneWithOffset(root->right, offset);
+        return newRoot;
+    }
+
+public:
+    vector<TreeNode*> generateTrees(int n) {
+        vector<vector<TreeNode*>> dp(n + 1);
+        dp[0] = {nullptr};
+
+        for (int nodes = 1; nodes <= n; ++nodes) {
+            for (int root = 1; root <= nodes; ++root) {
+                int leftCount = root - 1;
+                int rightCount = nodes - root;
+
+                for (TreeNode* leftSubtree : dp[leftCount]) {
+                    for (TreeNode* rightSubtree : dp[rightCount]) {
+                        TreeNode* rootNode = new TreeNode(root);
+                        rootNode->left = leftSubtree;
+                        rootNode->right = cloneWithOffset(rightSubtree, root);
+
+                        dp[nodes].push_back(rootNode);
+                    }
+                }
+            }
+        }
+        return dp[n];
+    }
+};
