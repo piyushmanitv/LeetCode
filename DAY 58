@@ -1,0 +1,60 @@
+873. Length of Longest Fibonacci Subsequence
+
+
+
+
+
+
+A sequence x1, x2, ..., xn is Fibonacci-like if:
+
+n >= 3
+xi + xi+1 == xi+2 for all i + 2 <= n
+Given a strictly increasing array arr of positive integers forming a sequence, 
+.return the length of the longest Fibonacci-like subsequence of arr. If one does not exist, return 0.
+
+A subsequence is derived from another sequence arr by deleting any number of elements 
+(including none) from arr, without changing the order of the remaining elements. For
+example, [3, 5, 8] is a subsequence of [3, 4, 5, 6, 7, 8].
+
+
+
+
+
+
+class Solution {
+public:
+    int lenLongestFibSubseq(vector<int>& arr) {
+        int n = arr.size();
+        map<pair<int,int>,int>indexes;
+
+        for(int i = 2 ;i < n;i++) {
+            int start = 0;
+            int end = i-1;
+            long long reqSum = arr[i];
+            long long sum;
+            while(start != end) {
+                sum = arr[start] + (long long)arr[end];
+                if(sum == reqSum) {
+                    indexes[{start,end}] = i;
+                    start++;
+                }
+                else if(sum < reqSum) start++;
+                else end--;
+            }
+        }
+        int count = 0;
+        int maxCount = 0;
+        for(auto &it : indexes) {
+            count = 2;
+            int i=it.first.first,j=it.first.second,k=it.second;
+            while((long long)arr[i]+arr[j] == (long long)arr[k]) {
+                count++;
+                i = j;
+                j = k;
+                k = indexes[{i,j}];
+            }
+            if(count > maxCount)maxCount = count;
+        }
+        return maxCount;
+    }
+};
