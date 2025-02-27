@@ -1,0 +1,45 @@
+149. Max Points on a Line
+
+
+
+
+
+Given an array of points where points[i] = [xi, yi] represents a point on the
+X-Y plane, return the maximum number of points that lie on the same straight line.
+
+
+
+
+
+
+
+class Solution {
+public:
+    int maxPoints(vector<vector<int>>& points) {
+         int ans = 0, n = points.size(), MOD = 33391;
+        if (n <= 1) return n;
+        auto gcd = [](int a, int b, auto& gcd) -> int {
+            return b == 0 ? a : gcd(b, a % b, gcd);
+        };
+        sort(points.begin(), points.end(), [](const auto& a, const auto& b) -> bool {
+            return a[0] < b[0] || a[0] == b[0] && a[1] < b[1];
+        });
+        vector<int> v(MOD, 0); 
+        for (int i = 0, b = 0; i < n; i++) {
+            while (b < n && points[b][0] == points[i][0]) b++;
+            ans = max(ans, (b - i) * (b - i - 1) / 2); 
+            for (int j = b; j < n; j++) { 
+                int dx = points[i][0] - points[j][0];
+                int dy = points[i][1] - points[j][1];
+                int g = gcd(dx, dy, gcd);
+                dx /= g, dy /= g; 
+                if (dx < 0) dx *= -1, dy *= -1;
+                int px = points[i][0] - dx * (points[i][0] / dx);
+                int py = points[i][1] - dy * (points[i][0] / dx);
+                unsigned long long int h = ((((((px * 1ULL << 4) ^ py) << 4) ^ dx) << 4) ^ dy) % MOD; 
+                ans = max(ans, ++v[h]);
+            }
+        }
+        return round((1 + sqrt(1 + 8 * ans)) / 2);  
+    }
+};
