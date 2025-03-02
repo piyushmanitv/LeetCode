@@ -1,0 +1,48 @@
+Find the Largest Almost Missing Integer
+
+
+
+
+
+You are given an integer array nums and an integer k.
+
+An integer x is almost missing from nums if x appears in exactly one subarray of size k within nums.
+
+Return the largest almost missing integer from nums. If no such integer exists, return -1.
+
+A subarray is a contiguous sequence of elements within an array.
+
+
+
+
+
+
+
+
+
+class Solution {
+public:
+    int largestInteger(vector<int>& nums, int k) {
+        int n = nums.size();
+        unordered_map<int, int> global_count;  
+        for (int i = 0; i <= n - k; i++) {
+            unordered_map<int, int> window_count; 
+            for (int j = i; j < i + k; j++) {
+                window_count[nums[j]] = 1;  
+            }
+
+            
+            for (auto &[num, _] : window_count) {
+                global_count[num]++;
+            }
+        }
+        int max_almost_missing = -1;
+        for (auto &[num, count] : global_count) {
+            if (count == 1) { 
+                max_almost_missing = max(max_almost_missing, num);
+            }
+        }
+
+        return max_almost_missing;
+    }
+};
