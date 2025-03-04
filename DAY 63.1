@@ -1,0 +1,68 @@
+79. Word Search
+
+
+
+
+ 
+Given an m x n grid of characters board and a string word, return true
+if word exists in the grid.
+
+The word can be constructed from letters of sequentially adjacent cells,
+where adjacent cells are horizontally or vertically neighboring. The 
+same letter cell may not be used more than once.
+
+
+
+
+
+
+
+
+class Solution {
+   public:
+    bool exist(vector<vector<char>>& board, string word) {
+        int m = board.size(), n = board[0].size();
+        unordered_map<char, int> boardCnt, wordCnt;
+        for (auto& row : board) {
+            for (char c : row) ++boardCnt[c];
+        }
+        for (char c : word) {
+            ++wordCnt[c];
+            if (boardCnt[c] < wordCnt[c]) return false;
+        }
+        if (boardCnt[word.back()] < boardCnt[word[0]]) reverse(word.begin(), word.end());
+        vector<vector<bool>> visited(m, vector<bool>(n, false));
+        for (int i = 0; i < m; ++i) {
+            for (int j = 0; j < n; ++j) {
+                if (board[i][j] == word[0]) {
+                    if (dfs(board, visited, word, i, j, 0)) return true;
+                }
+            }
+        }
+        return false;
+    }
+
+   private:
+    static constexpr int DIRS[4][2] = {{0, 1}, {0, -1}, {1, 0}, {-1, 0}};
+    bool found = false;
+
+    bool dfs(vector<vector<char>>& board, vector<vector<bool>>& visited, string& word, int i, int j, int idx) {
+        if (found) return true;
+        if (board[i][j] != word[idx]) {
+            return false;
+        } else if (idx == word.size() - 1) {
+            return true;
+        }
+        int m = board.size(), n = board[0].size();
+        visited[i][j] = true;
+        for (auto& [di, dj] : DIRS) {
+            int ni = i + di, nj = j + dj;
+            if (ni >= 0 && ni < m && nj >= 0 && nj < n && !visited[ni][nj]) {
+                found = found | dfs(board, visited, word, ni, nj, idx + 1);
+                if (found) break;
+            }
+        }
+        visited[i][j] = false;
+        return found;
+    }
+};
