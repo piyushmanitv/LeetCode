@@ -1,0 +1,72 @@
+CONTEST QUESTION
+
+
+
+
+3479. Fruits Into Baskets III
+
+
+You are given two arrays of integers, fruits and baskets, each of length n, 
+where fruits[i] represents the quantity of the ith type of fruit, and 
+baskets[j] represents the capacity of the jth basket.
+
+From left to right, place the fruits according to these rules:
+
+Each fruit type must be placed in the leftmost available basket with a capacity
+greater than or equal to the quantity of that fruit type.
+Each basket can hold only one type of fruit.
+If a fruit type cannot be placed in any basket, it remains unplaced.
+Return the number of fruit types that remain unplaced after all possible
+allocations are made.
+
+
+
+
+
+
+
+
+
+class Solution {
+public:
+    int numOfUnplacedFruits(vector<int>& fruits, vector<int>& baskets) {
+        int n = fruits.size();
+        int size = 1;
+        while (size < n) size *= 2;
+        vector<int> seg(2 * size, 0);
+        for (int i = 0; i < n; i++) {
+            seg[size + i] = baskets[i];
+        }
+        for (int i = size - 1; i >= 1; i--) {
+            seg[i] = max(seg[2 * i], seg[2 * i + 1]);
+        }
+        auto update = [&](int pos, int value) {
+            pos += size; 
+            seg[pos] = value;
+            for (pos /= 2; pos >= 1; pos /= 2) {
+                seg[pos] = max(seg[2 * pos], seg[2 * pos + 1]);
+            }
+        }; 
+        auto query_index = [&](int required) -> int {
+            if (seg[1] < required) return -1; 
+            int idx = 1;
+            while (idx < size) {
+                if (seg[2 * idx] >= required)
+                    idx = 2 * idx;      
+                else
+                    idx = 2 * idx + 1;  
+            }
+            return idx - size; 
+        };       
+        int unplaced = 0;
+        for (int fruit : fruits) {
+            int idx = query_index(fruit);
+            if (idx == -1) {
+                unplaced++;
+            } else {
+                update(idx, 0);
+            }
+        }
+        return unplaced;
+    }
+};
