@@ -1,0 +1,55 @@
+5. Longest Palindromic Substring
+
+
+
+
+Given a string s, return the longest palindromic substring in s.
+
+
+
+
+
+
+
+
+class Solution {
+public:
+    int getCurrentMaxPalindromeSize (int left, int right, const string& input)
+    {
+        const int inputSize = input.size();
+        int start = left, length = 1;
+        while (left >= 0 and right < inputSize)
+        {
+            if (input[left] != input[right])
+            {
+                break;
+            }
+            start = left;
+            length = right - left + 1;
+            --left, ++right;
+        }
+        return length;
+    }
+
+    string longestPalindrome (const string& input)
+    {
+        const int inputSize = input.size();
+        int resultSize = 1, start = 0;
+
+        for (int middle = 0; middle < inputSize; ++middle)
+        {
+            int currentPalindromeSize1 = getCurrentMaxPalindromeSize (middle, middle + 1, input);
+            int currentPalindromeSize2 = getCurrentMaxPalindromeSize (middle, middle, input);
+
+            int currentMaxPalindromeSize = max (currentPalindromeSize1, currentPalindromeSize2);
+
+            if (currentMaxPalindromeSize > resultSize)
+            {
+                start = middle - (currentMaxPalindromeSize - 1)/2;
+                resultSize = currentMaxPalindromeSize;
+            }
+        }
+
+        return input.substr (start, resultSize);
+    }
+};
