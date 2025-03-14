@@ -1,0 +1,42 @@
+96. Unique Binary Search Trees
+
+
+
+
+
+Given an integer n, return the number of structurally unique BST's 
+(binary search trees) which has exactly n nodes of unique values from 1 to n.
+
+
+
+
+
+
+
+class Solution {
+public:
+    vector<int> dp;
+    int rec(int n)
+    {
+        if(n <= 1)
+        {
+            return 1;
+        }
+        if(dp[n] != -1)
+        {
+            return dp[n];
+        }
+        int ans = 0;
+        for(int i = 1 ; i <= n ; i++)
+        {
+            int left = rec(i - 1);
+            int right = rec(n - i);
+            ans += left * right;
+        }
+        return dp[n] = ans;
+    }
+    int numTrees(int n) {
+        dp.resize(n + 1 , -1);
+        return rec(n);
+    }
+};
