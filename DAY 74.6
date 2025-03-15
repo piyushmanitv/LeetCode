@@ -1,0 +1,35 @@
+Q1. Unique 3-Digit Even Numbers
+
+
+
+
+
+You are given an array of digits called digits. Your task is to determine 
+the number of distinct three-digit even numbers that can be formed using these digits.
+
+Note: Each copy of a digit can only be used once per number, and there may not be leading zeros.
+
+
+
+
+
+
+
+class Solution {
+public:
+    int totalNumbers(vector<int>& digits) {
+        unordered_set<int> uniqueNumbers;
+        int n = digits.size();
+        for (int i = 0; i < n; i++) {
+            if (digits[i] == 0) continue;
+            for (int j = 0; j < n; j++) {
+                if (i == j) continue;
+                for (int k = 0; k < n; k++) {
+                    if (k == i || k == j || digits[k] % 2 != 0) continue;
+                    uniqueNumbers.insert(digits[i] * 100 + digits[j] * 10 + digits[k]);
+                }
+            }
+        }
+        return (int)uniqueNumbers.size();
+    }
+};©leetcode
