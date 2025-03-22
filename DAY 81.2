@@ -1,0 +1,91 @@
+2685. Count the Number of Complete Components
+
+
+
+
+
+
+
+
+
+You are given an integer n. There is an undirected graph with n vertices, numbered from 
+0 to n - 1. You are given a 2D integer array edges where edges[i] = [ai, bi] denotes that
+there exists an undirected edge connecting vertices ai and bi.
+
+Return the number of complete connected components of the graph.
+
+A connected component is a subgraph of a graph in which there exists a path between any two
+vertices, and no vertex of the subgraph shares an edge with a vertex outside of the subgraph.
+
+A connected component is said to be complete if there exists an edge between every pair of its vertices.
+
+
+
+
+
+
+
+
+
+
+
+
+class Solution {
+public:
+int findPar(int node, vector<int>&par){
+    if(node==par[node])
+    {
+        return node;
+    }
+    return par[node]= findPar(par[node], par);
+}
+    int countCompleteComponents(int n, vector<vector<int>>& edges) {
+        vector<int>count(n,1),par(n),edge(n,0), rank(n,0);
+        for(int i=0;i<n;i++)
+        {
+            par[i]=i;
+        }
+        int par1,par2;
+        for(int i=0;i<edges.size();i++)
+        {
+            par1=findPar(edges[i][0], par);
+            par2=findPar(edges[i][1], par);
+
+            if(par1==par2)
+            {
+                edge[par1]++;
+            }
+            else
+            {
+                if(rank[par1]==rank[par2])
+                {
+                par[par1]=par2;
+                count[par2]+=count[par1];
+                edge[par2]+=edge[par1]+1;
+                rank[par2]++;
+                }
+                else if(rank[par1]>rank[par2])
+                {
+                par[par2]=par1;
+                count[par1]+=count[par2];
+                edge[par1]+=edge[par2]+1; 
+                }
+                else
+                {
+                par[par1]=par2;
+                count[par2]+=count[par1];
+                edge[par2]+=edge[par1]+1;                    
+                }
+            }
+        }
+        int res=0;
+        for(int i=0;i<n;i++)
+        {
+            if(i==par[i] && edge[i]==(count[i]*(count[i]-1))/2)
+            {
+                res++;
+            }
+        }
+        return res;
+    }
+};
