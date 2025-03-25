@@ -1,0 +1,58 @@
+3394. Check if Grid can be Cut into Sections
+
+
+
+
+
+
+
+You are given an integer n representing the dimensions of an n x n grid, with the origin at the bottom-left 
+corner of the grid. You are also given a 2D array of coordinates rectangles, where rectangles[i] is in the 
+form [startx, starty, endx, endy], representing a rectangle on the grid. Each rectangle is defined as follows:
+
+(startx, starty): The bottom-left corner of the rectangle.
+(endx, endy): The top-right corner of the rectangle.
+Note that the rectangles do not overlap. Your task is to determine if it is possible to make either two 
+horizontal or two vertical cuts on the grid such that:
+
+Each of the three resulting sections formed by the cuts contains at least one rectangle.
+Every rectangle belongs to exactly one section.
+Return true if such cuts can be made; otherwise, return false.
+
+
+
+
+
+
+
+
+
+
+
+const int N=200000;
+unsigned X[N], Y[N];
+class Solution {
+public:
+    bool cut3(unsigned* X, int M){
+        sort(X, X+M);
+        int sum=0, touch0=0;
+        for(int i=0; i<M-1; i++){
+            sum+=(X[i]&1)*2-1;
+            touch0+=sum==0;
+            if (touch0>=2) return 1;
+        }
+        return 0;
+    }
+    bool checkValidCuts(int n, vector<vector<int>>& rectangles) {
+        const int m=rectangles.size(), M=m*2;
+        int i=0;
+        for(auto& r: rectangles){
+            unsigned xs=r[0], ys=r[1], xe=r[2], ye=r[3];
+            X[i]=(xs<<1)+1; Y[i++]=(ys<<1)+1;
+            X[i]=(xe<<1)  ; Y[i++]=(ye<<1); 
+        }
+        return cut3(X, M) || cut3(Y, M);
+    }
+};
+
+ 
