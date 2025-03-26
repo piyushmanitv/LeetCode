@@ -1,0 +1,141 @@
+212. Word Search II
+
+
+
+
+
+
+
+
+Given an m x n board of characters and a list of strings words, return all words on the board.
+
+Each word must be constructed from letters of sequentially adjacent cells, where adjacent cells 
+are horizontally or vertically neighboring. The same letter cell may not be used more than once in a word.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+class Solution {
+public:
+    vector<string> findWords(vector<vector<char>>& board, vector<string>& words) {
+        int res;
+		vector<string> result;
+		
+		for (int i = 0; i < board.size(); i++) {
+			for (int j = 0; j < board[0].size(); j++) {
+				_vec[board[i][j] - 'a'].push_back((i << 4) + j);
+			}
+		}
+
+		constructTrie(words);
+
+		for (int i = 0; i < board.size(); i++) {
+			for (int j = 0; j < board[i].size(); j++) {
+				DFS(board, i, j, _root);
+			}
+		}
+		return _res;
+
+    }
+private:
+	struct Trie {
+		Trie* node[26];
+		string _word;
+		Trie() {
+			for (int i = 0; i < 26; i++) {
+				node[i] = nullptr;
+			}
+			_word = "";
+		}
+	};
+	vector<unsigned char> _vec[26];
+	Trie* _root;
+	vector<string> _res;
+	
+	void constructTrie(vector<string>& words) {
+		_root = new Trie();
+		Trie* _ptr;
+		for (int i = 0; i < words.size(); i++) {
+			_ptr = _root;
+			bool skip = false;
+			for (int j = 0; j < words[i].size(); j++) {
+				if (_vec[words[i][j] - 'a'].size() == 0) {
+					skip = true;
+					break;
+				}
+			}
+			if (skip == true)
+				continue;
+			for (int j = 0; j < words[i].size(); j++) {
+				if (_ptr->node[words[i][j] - 'a'] == nullptr) {
+					Trie* _newNode = new Trie();
+					_ptr->node[words[i][j] - 'a'] = _newNode;
+				}
+				_ptr = _ptr->node[words[i][j] - 'a'];
+			}
+			_ptr->_word = words[i];
+		}
+	}
+
+	void DFS(vector<vector<char>>& board, int x, int y, Trie* _ptr) {
+		unsigned char size = board.size();
+		int _char = board[x][y];
+		int i;
+		
+		if (_ptr->node[_char - 'a'] == nullptr) {
+			return;
+		}
+
+		board[x][y] = '#';
+
+		if (_ptr->node[_char - 'a']->_word != "") {
+			_res.push_back(_ptr->node[_char - 'a']->_word);
+			_ptr->node[_char - 'a']->_word = "";
+		}
+
+		if (x > 0 &&
+			(board[x - 1][y] != '#')) {
+			DFS(board, x - 1, y, _ptr->node[_char - 'a']);
+		}
+
+		if ((x < board.size() - 1) &&
+			(board[x + 1][y] != '#')) {
+			DFS(board, x + 1, y, _ptr->node[_char - 'a']);
+		}
+
+		if ((y > 0) &&
+			(board[x][y - 1] != '#')) {
+			DFS(board, x, y - 1, _ptr->node[_char - 'a']);
+		}
+		
+		if ((y < board[0].size() - 1) &&
+			(board[x][y + 1] != '#')) {
+			DFS(board, x, y + 1, _ptr->node[_char - 'a']);
+		}
+
+		board[x][y] = _char;
+		
+		for (i = 0; i < 26; i++) {
+			if (_ptr->node[_char - 'a']->node[i] != nullptr) {
+				break;
+			}			
+		}
+		if (i == 26) {
+			delete _ptr->node[_char - 'a'];
+			_ptr->node[_char - 'a'] = nullptr;
+		}
+		
+		return;
+	}
+};
