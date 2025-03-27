@@ -1,0 +1,42 @@
+HEAP
+
+
+
+
+347. Top K Frequent Elements
+
+
+
+Given an integer array nums and an integer k, return the k most frequent 
+elements. You may return the answer in any order.
+
+
+
+
+
+
+
+
+
+
+
+class Solution {
+public:
+    vector<int> topKFrequent(vector<int>& nums, int k) {
+        unordered_map<int,int> um;
+        vector<pair<int,int>> p;
+        vector<int> ans;
+        for(int i:nums){
+            um[i]++;
+        }
+        for(auto i:um){
+            p.push_back({i.second,i.first});
+        }
+        sort(p.rbegin(),p.rend());
+
+        for(int i=0;i<k;i++){
+            ans.push_back(p[i].second);
+        }
+        return ans;
+    }
+};
