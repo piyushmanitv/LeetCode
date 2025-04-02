@@ -1,0 +1,39 @@
+2873. Maximum Value of an Ordered Triplet I
+
+
+
+
+You are given a 0-indexed integer array nums.
+
+Return the maximum value over all triplets of indices (i, j, k) such that i < j < k. 
+If all such triplets have a negative value, return 0.
+
+The value of a triplet of indices (i, j, k) is equal to (nums[i] - nums[j]) * nums[k].
+
+
+
+
+
+
+
+
+
+
+
+
+
+class Solution {
+public:
+    long long maximumTripletValue(vector<int>& nums) {
+        const int n=nums.size();
+        vector<int> Y(n, 0), Q(n, 0);
+        for(int i=0; i<n-1; i++){
+            Y[i+1]=max(Y[i], nums[i]);
+            Q[n-2-i]=max(Q[n-i-1], nums[n-i-1]);
+        }
+        long long ans=0;
+        for(int j=1; j<n-1; j++)
+            ans=max(ans, (long long)(Y[j]-nums[j])*Q[j]);
+        return ans;
+    }
+};
