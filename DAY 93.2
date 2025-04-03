@@ -1,0 +1,61 @@
+233. Number of Digit One
+
+
+
+
+Given an integer n, count the total number of digit 1 appearing in all non-negative integers less than or equal to n.
+
+
+
+
+
+
+
+
+
+int dp[10][2][10];
+
+class Solution {
+public:
+    int countDigitOne(int nums) {
+        
+        memset(dp,-1,sizeof(dp));
+
+   int i=0,tight=1,countOnes=0;  
+
+   
+        
+        string str=to_string(nums);
+        
+   return find(i,tight,countOnes,str);
+
+        
+    }
+    
+int find(int i,int tight,int countOnes,string nums){
+    
+  if(i==nums.size())
+  return countOnes;
+
+  if(dp[i][tight][countOnes]!=-1)
+  return dp[i][tight][countOnes];
+
+  int ub;  
+
+  if(tight==1)
+  ub=nums[i]-'0';
+  else
+  ub=9;
+
+  int ans=0;
+
+  for(int d=0;d<=ub;d++){
+
+   ans=ans+find(i+1,tight && (d==ub),countOnes + (d==1),nums);
+      
+  }
+
+  return dp[i][tight][countOnes]=ans;
+ }
+
+};
