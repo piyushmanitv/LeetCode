@@ -1,0 +1,77 @@
+3272. Find the Count of Good Integers
+
+
+
+
+
+You are given two positive integers n and k.
+
+An integer x is called k-palindromic if:
+
+x is a palindrome.
+x is divisible by k.
+An integer is called good if its digits can be rearranged to form a k-palindromic integer. For example, for k = 2, 
+2020 can be rearranged to form the k-palindromic integer 2002, whereas 1010 cannot be rearranged to form a k-palindromic integer.
+
+Return the count of good integers containing n digits.
+
+Note that any integer must not have leading zeros, neither before nor after rearrangement. For example, 1010 cannot be rearranged to form 101.
+
+
+
+
+
+
+
+
+
+
+
+class Solution {
+public:
+    long long countGoodIntegers(int n, int k) {
+        unordered_set<string> uniqueSortedDigits;
+        bool isOddLength = n % 2 == 1;
+        int halfLength = (n + 1) / 2;
+        int start = pow(10, halfLength - 1);
+        int end = pow(10, halfLength);
+
+        for (int i = start; i < end; ++i) {
+            string firstHalf = to_string(i);
+            string secondHalf = firstHalf;
+            reverse(secondHalf.begin(), secondHalf.end());
+            if (isOddLength) secondHalf = secondHalf.substr(1);
+            string palindromeStr = firstHalf + secondHalf;
+            if (palindromeStr[0] == '0') continue;
+
+            long long palindromeNum = stoll(palindromeStr);
+            if (palindromeNum % k == 0) {
+                string sortedDigits = palindromeStr;
+                sort(sortedDigits.begin(), sortedDigits.end());
+                uniqueSortedDigits.insert(sortedDigits);
+            }
+        }
+
+        vector<long long> factorial(n + 1, 1);
+        for (int i = 1; i <= n; ++i) {
+            factorial[i] = factorial[i - 1] * i;
+        }
+
+        long long total = 0;
+        for (const auto& sorted : uniqueSortedDigits) {
+            vector<int> count(10, 0);
+            for (char digit : sorted) {
+                count[digit - '0']++;
+            }
+
+            int leadingOptions = n - count[0];
+            long long perms = leadingOptions * factorial[n - 1];
+            for (int c : count) {
+                perms /= factorial[c];
+            }
+            total += perms;
+        }
+
+        return total;
+    }
+};
