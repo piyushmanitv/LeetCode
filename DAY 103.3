@@ -1,0 +1,117 @@
+Q4. Shortest Path in a Weighted Tree
+Solved
+Hard
+7 pt.
+You are given an integer n and an undirected, weighted tree rooted at node 1 with n nodes numbered from 1 to n. This is represented by a 2D array edges of length n - 1, where edges[i] = [ui, vi, wi] indicates an undirected edge from node ui to vi with weight wi.
+
+You are also given a 2D integer array queries of length q, where each queries[i] is either:
+
+[1, u, v, w'] – Update the weight of the edge between nodes u and v to w', where (u, v) is guaranteed to be an edge present in edges.
+[2, x] – Compute the shortest path distance from the root node 1 to node x.
+Return an integer array answer, where answer[i] is the shortest path distance from node 1 to x for the ith query of [2, x].
+
+
+
+
+
+
+
+
+
+
+
+
+class FenwickTree {
+    vector<long long> bit;
+    int n;
+public:
+    FenwickTree(int size) {
+        n = size + 1;
+        bit.assign(n, 0);
+    }
+
+    void update(int index, long long value) {
+        while (index < n) {
+            bit[index] += value;
+            index += index & -index;
+        }
+    }
+
+    long long query(int index) {
+        long long sum = 0;
+        while (index > 0) {
+            sum += bit[index];
+            index -= index & -index;
+        }
+        return sum;
+    }
+
+    void range_update(int l, int r, long long value) {
+        update(l, value);
+        update(r + 1, -value);
+    }
+
+    long long point_query(int index) {
+        return query(index);
+    }
+};
+
+class Solution {
+public:
+    vector<int> treeQueries(int n, vector<vector<int>>& edges, vector<vector<int>>& queries) {
+        unordered_map<long long, int> edgeWeight;
+        unordered_map<int, vector<int>> graph;
+        vector<int> parent(n + 1, -1), depth(n + 1, 0), in(n + 1), out(n + 1);
+        vector<long long> dist(n + 1, 0);
+        int timer = 0;
+
+        auto hashEdge = [](int u, int v) {
+            if (u > v) swap(u, v);
+            return (1LL * u << 32) | v;
+        };
+ 
+        for (auto& edge : edges) {
+            int u = edge[0], v = edge[1], w = edge[2];
+            edgeWeight[hashEdge(u, v)] = w;
+            graph[u].push_back(v);
+            graph[v].push_back(u);
+        }
+
+        function<void(int, int, long long)> dfs = [&](int u, int p, long long d) {
+            in[u] = ++timer;
+            dist[u] = d;
+            parent[u] = p;
+            for (int v : graph[u]) {
+                if (v != p) {
+                    int weight = edgeWeight[hashEdge(u, v)];
+                    dfs(v, u, d + weight);
+                }
+            }
+            out[u] = timer;
+        };
+
+        dfs(1, -1, 0);   
+
+        FenwickTree fenwick(n + 2);
+        vector<int> result;
+
+        for (auto& q : queries) {
+            if (q[0] == 1) {
+                int u = q[1], v = q[2], new_wt = q[3];
+                long long key = hashEdge(u, v);
+                int old_wt = edgeWeight[key];
+                if (old_wt == new_wt) continue;
+                int child = (parent[v] == u) ? v : u;
+                int delta = new_wt - old_wt;
+                fenwick.range_update(in[child], out[child], delta);
+                edgeWeight[key] = new_wt;
+            } else {
+                int u = q[1];
+                long long val = dist[u] + fenwick.point_query(in[u]);
+                result.push_back(static_cast<int>(val));
+            }
+        }
+        return result;
+    }
+};
+©leetcode
