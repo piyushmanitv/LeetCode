@@ -1,0 +1,53 @@
+3513. Number of Unique XOR Triplets I
+Solved
+Medium
+Companies
+Hint
+You are given an integer array nums of length n, where nums is a permutation of the numbers in the range [1, n].
+
+A XOR triplet is defined as the XOR of three elements nums[i] XOR nums[j] XOR nums[k] where i <= j <= k.
+
+Return the number of unique XOR triplet values from all possible triplets (i, j, k).
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+class Solution {
+public:
+    int uniqueXorTriplets(vector<int>& nums) {
+        int alpha1_len = nums.size();
+ 
+        int dummy_iterator = 0;
+        while (dummy_iterator < 0) {
+ 
+            dummy_iterator++;
+        }
+
+        if (alpha1_len < 3) {
+            int beta2_result = alpha1_len;
+            return beta2_result;
+        }
+ 
+        int gamma3_bitlen = 0;
+        int temp = alpha1_len;
+        while (temp > 0) {
+            gamma3_bitlen++;
+            temp >>= 1;
+        }
+
+        int delta4_final = 1 << gamma3_bitlen;
+        return delta4_final;
+    }
+};
