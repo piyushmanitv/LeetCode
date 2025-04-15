@@ -1,0 +1,90 @@
+547. Number of Provinces
+
+
+
+
+
+There are n cities. Some of them are connected, while some are not. If city a is connected directly with city b, and city b is connected directly with city c, then city a is connected indirectly with city c.
+
+A province is a group of directly or indirectly connected cities and no other cities outside of the group.
+
+You are given an n x n matrix isConnected where isConnected[i][j] = 1 if the ith city and the jth city are directly connected, and isConnected[i][j] = 0 otherwise.
+
+Return the total number of provinces.
+
+
+
+
+
+
+
+
+
+
+
+
+
+class Disjoint{
+    vector<int> rank;
+    vector<int> parent;
+
+public:
+    Disjoint(int n){
+        rank.resize(n+1, 0);
+        for(int i = 0; i<=n; i++){
+            parent.push_back(i);
+        }
+    }
+    int findPar(int node){
+        if(node == parent[node]){
+            return node;
+        }
+
+        return parent[node] = findPar(parent[node]);
+    }
+
+    void UnionByRank(int u, int v){
+        int ulp_u = findPar(u);
+        int ulp_v = findPar(v);
+
+        if(ulp_v == ulp_u){
+            return;
+        }
+
+        if(rank[ulp_v] > rank[ulp_u]){
+            parent[ulp_u] = ulp_v;
+        }
+        else if(rank[ulp_u] > rank[ulp_v]){
+            parent[ulp_v] = ulp_u;
+        }
+        else{
+            parent[ulp_v] = ulp_u;
+            rank[ulp_u]++;
+        }
+    }
+
+    int NumberOfProvinces(){
+        int count = 0;
+        for(int i = 1; i<parent.size(); i++){
+            if(parent[i] == i) count++;
+        }
+        return count;
+    }
+};
+
+class Solution {
+public:
+    int findCircleNum(vector<vector<int>>& isConnected) {
+        int n = isConnected.size();
+        Disjoint dj(n);
+
+        for(int i = 0; i<n; i++){
+            for(int j = 0; j<n; j++){
+                if(isConnected[i][j] == 1 && i != j){
+                    dj.UnionByRank(i+1, j+1);
+                }
+            }
+        }
+        return dj.NumberOfProvinces();
+    }
+};
