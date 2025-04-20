@@ -1,0 +1,38 @@
+215. Kth Largest Element in an Array
+
+
+
+
+Given an integer array nums and an integer k, return the kth largest element in the array.
+
+Note that it is the kth largest element in the sorted order, not the kth distinct element.
+
+Can you solve it without sorting?
+
+
+
+
+
+
+
+
+
+
+class Solution {
+public:
+    int findKthLargest(vector<int>& nums, int k) {
+        vector<int> count(20001, 0); 
+
+        for (int num : nums)
+            count[num + 10000]++;
+
+        for (int i = 20000; i >= 0; i--) {
+            if (count[i] > 0) {
+                k -= count[i];
+                if (k <= 0)
+                    return i - 10000;
+            }
+        }
+        return -1;
+    }
+};
