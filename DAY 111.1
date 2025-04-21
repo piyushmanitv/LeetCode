@@ -1,0 +1,54 @@
+2336. Smallest Number in Infinite Set
+
+
+
+
+You have a set which contains all positive integers [1, 2, 3, 4, 5, ...].
+
+Implement the SmallestInfiniteSet class:
+
+SmallestInfiniteSet() Initializes the SmallestInfiniteSet object to contain all positive integers.
+int popSmallest() Removes and returns the smallest integer contained in the infinite set.
+void addBack(int num) Adds a positive integer num back into the infinite set, if it is not already in the infinite set.
+
+
+
+
+
+
+
+
+
+
+
+
+class SmallestInfiniteSet {
+private:
+    std::vector<bool> a;
+    int minIndex;
+
+public:
+    SmallestInfiniteSet() {
+        a = std::vector<bool>(1001, false);
+        minIndex = 0;
+    }
+
+    int popSmallest() {
+        while (a[minIndex]) minIndex++;
+        a[minIndex] = true;
+        return minIndex + 1;
+    }
+    
+    void addBack(int num) {
+        a[num - 1] = false;
+        minIndex = std::min(minIndex, num - 1);
+    }
+};
+
+
+/**
+ * Your SmallestInfiniteSet object will be instantiated and called as such:
+ * SmallestInfiniteSet* obj = new SmallestInfiniteSet();
+ * int param_1 = obj->popSmallest();
+ * obj->addBack(num);
+ */
