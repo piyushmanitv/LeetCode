@@ -1,0 +1,31 @@
+Q2. Make Array Non-decreasing
+Medium
+4 pt.
+You are given an integer array nums. In one operation, you can select a subarray and replace it with a single element equal to its maximum value.
+
+Return the maximum possible size of the array after performing zero or more operations such that the resulting array is non-decreasing.
+
+
+
+
+
+
+
+
+
+
+
+ class Solution {
+public:
+    int maximumPossibleSize(vector<int>& nums) {
+        vector<int> stack;
+        for (int num : nums) {
+            while (!stack.empty() && stack.back() > num) {
+                num = max(num, stack.back());
+                stack.pop_back();
+            }
+            stack.push_back(num);
+        }
+        return stack.size();
+    }
+};
