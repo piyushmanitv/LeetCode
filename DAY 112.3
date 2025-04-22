@@ -1,0 +1,138 @@
+Q4. Find X Value of Array II
+Hard
+6 pt.
+You are given an array of positive integers nums and a positive integer k. You are also given a 2D array queries, where queries[i] = [indexi, valuei, starti, xi].
+
+You are allowed to perform an operation once on nums, where you can remove any suffix from nums such that nums remains non-empty.
+
+The x-value of nums for a given x is defined as the number of ways to perform this operation so that the product of the remaining elements leaves a remainder of x modulo k.
+
+For each query in queries you need to determine the x-value of nums for xi after performing the following actions:
+
+Update nums[indexi] to valuei. Only this step persists for the rest of the queries.
+Remove the prefix nums[0..(starti - 1)] (where nums[0..(-1)] will be used to represent the empty prefix).
+Return an array result of size queries.length where result[i] is the answer for the ith query.
+
+A prefix of an array is a subarray that starts from the beginning of the array and extends to any point within it.
+
+A suffix of an array is a subarray that starts at any point within the array and extends to the end of the array.
+
+Note that the prefix and suffix to be chosen for the operation can be empty.
+
+Note that x-value has a different definition in this version.
+
+
+
+
+
+
+
+
+
+
+
+#include <vector>
+#include <algorithm>
+using namespace std;
+
+class Solution {
+    struct SegmentTreeNode {
+        int l, r;
+        int product;
+        vector<int> pre;
+        SegmentTreeNode *left, *right;
+        SegmentTreeNode(int l, int r, int k) : l(l), r(r), product(1), left(nullptr), right(nullptr) {
+            pre.resize(k, 0);
+        }
+    };
+
+    int k;
+    vector<int> nums;
+    SegmentTreeNode* root;
+
+    SegmentTreeNode* build(int l, int r) {
+        SegmentTreeNode* node = new SegmentTreeNode(l, r, k);
+        if (l == r) {
+            int val = nums[l] % k;
+            node->product = val;
+            node->pre[val] = 1;
+            return node;
+        }
+        int mid = (l + r) / 2;
+        node->left = build(l, mid);
+        node->right = build(mid + 1, r);
+        node->product = (node->left->product * node->right->product) % k;
+        for (int x = 0; x < k; ++x) {
+            node->pre[x] += node->left->pre[x];
+        }
+        for (int y = 0; y < k; ++y) {
+            int val = (node->left->product * y) % k;
+            node->pre[val] += node->right->pre[y];
+        }
+        return node;
+    }
+
+    void update(SegmentTreeNode* node, int idx, int old_val, int new_val) {
+        if (node->l == node->r) {
+            int val = new_val % k;
+            node->product = val;
+            fill(node->pre.begin(), node->pre.end(), 0);
+            node->pre[val] = 1;
+            return;
+        }
+        if (idx <= node->left->r) {
+            update(node->left, idx, old_val, new_val);
+        } else {
+            update(node->right, idx, old_val, new_val);
+        }
+        int old_product = node->product;
+        node->product = (node->left->product * node->right->product) % k;
+        fill(node->pre.begin(), node->pre.end(), 0);
+        for (int x = 0; x < k; ++x) {
+            node->pre[x] += node->left->pre[x];
+        }
+        for (int y = 0; y < k; ++y) {
+            int val = (node->left->product * y) % k;
+            node->pre[val] += node->right->pre[y];
+        }
+    }
+
+    int query(SegmentTreeNode* node, int l, int r, int xi, int &accumulated) {
+        if (node->r < l || node->l > r) return 0;
+        if (l <= node->l && node->r <= r) {
+            int count = 0;
+            for (int x = 0; x < k; ++x) {
+                if ((accumulated * x) % k == xi) {
+                    count += node->pre[x];
+                }
+            }
+            accumulated = (accumulated * node->product) % k;
+            return count;
+        }
+        return query(node->left, l, r, xi, accumulated) + query(node->right, l, r, xi, accumulated);
+    }
+
+public:
+    vector<int> resultArray(vector<int>& nums, int k, vector<vector<int>>& queries) {
+        this->k = k;
+        this->nums = nums;
+        int n = nums.size();
+        if (n == 0) return {};
+        root = build(0, n - 1);
+        vector<int> res;
+        for (auto &q : queries) {
+            int idx = q[0], val = q[1], start = q[2], x = q[3];
+            int old_val = nums[idx];
+            nums[idx] = val;
+            update(root, idx, old_val, val);
+            if (start >= n) {
+                res.push_back(0);
+                continue;
+            }
+            int accumulated = 1;
+            int ans = query(root, start, n - 1, x, accumulated);
+            res.push_back(ans);
+        }
+        return res;
+    }
+};
