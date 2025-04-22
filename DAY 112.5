@@ -1,0 +1,79 @@
+2338. Count the Number of Ideal Arrays
+Solved
+Hard
+Topics
+Companies
+Hint
+You are given two integers n and maxValue, which are used to describe an ideal array.
+
+A 0-indexed integer array arr of length n is considered ideal if the following conditions hold:
+
+Every arr[i] is a value from 1 to maxValue, for 0 <= i < n.
+Every arr[i] is divisible by arr[i - 1], for 0 < i < n.
+Return the number of distinct ideal arrays of length n. Since the answer may be very large, return it modulo 109 + 7.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+class Solution {
+public:
+    const int MOD = 1e9 + 7;
+
+    long long modPow(long long x, long long n, long long mod) {
+        long long res = 1;
+        while (n > 0) {
+            if (n % 2) res = res * x % mod;
+            x = x * x % mod;
+            n /= 2;
+        }
+        return res;
+    }
+
+    long long modInv(long long a, long long mod) {
+        return modPow(a, mod - 2, mod);
+    }
+
+    int idealArrays(int n, int maxValue) {
+        int maxLen = log2(maxValue) + 1;
+        vector<vector<int>> dp(maxLen + 1, vector<int>(maxValue + 1, 0));
+
+        for (int v = 1; v <= maxValue; ++v)
+            dp[1][v] = 1;
+
+        for (int len = 2; len <= maxLen; ++len) {
+            for (int u = 1; u <= maxValue; ++u) {
+                if (dp[len - 1][u]) {
+                    for (int v = u * 2; v <= maxValue; v += u) {
+                        dp[len][v] = (dp[len][v] + dp[len - 1][u]) % MOD;
+                    }
+                }
+            }
+        }
+
+        vector<long long> f(maxLen + 1, 0);
+        for (int len = 1; len <= maxLen; ++len) {
+            for (int v = 1; v <= maxValue; ++v) {
+                f[len] = (f[len] + dp[len][v]) % MOD;
+            }
+        }
+
+        long long ans = 0, comb = 1;
+        for (int len = 1; len <= maxLen; ++len) {
+            if (len > 1)
+                comb = comb * (n - len + 1) % MOD * modInv(len - 1, MOD) % MOD;
+            ans = (ans + comb * f[len]) % MOD;
+        }
+
+        return ans;
+    }
+};
