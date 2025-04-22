@@ -1,0 +1,62 @@
+Q3. Find X Value of Array I
+Medium
+5 pt.
+You are given an array of positive integers nums, and a positive integer k.
+
+You are allowed to perform an operation once on nums, where in each operation you can remove any non-overlapping prefix and suffix from nums such that nums remains non-empty.
+
+You need to find the x-value of nums, which is the number of ways to perform this operation so that the product of the remaining elements leaves a remainder of x when divided by k.
+
+Return an array result of size k where result[x] is the x-value of nums for 0 <= x <= k - 1.
+
+A prefix of an array is a subarray that starts from the beginning of the array and extends to any point within it.
+
+A suffix of an array is a subarray that starts at any point within the array and extends to the end of the array.
+
+Note that the prefix and suffix to be chosen for the operation can be empty.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+#include <vector>
+using namespace std;
+
+class Solution {
+public:
+    vector<long long> resultArray(vector<int>& nums, int k) {
+        vector<long long> result(k, 0);
+        vector<long long> current_mods(k, 0);
+        
+        for (int num : nums) {
+            vector<long long> temp_mods(k, 0);
+            int mod_num = num % k;
+ 
+            for (int mod = 0; mod < k; ++mod) {
+                if (current_mods[mod] > 0) {
+                    int new_mod = (mod * mod_num) % k;
+                    temp_mods[new_mod] += current_mods[mod];
+                }
+            }
+ 
+            temp_mods[mod_num] += 1;
+ 
+            for (int mod = 0; mod < k; ++mod) {
+                result[mod] += temp_mods[mod];
+            }
+ 
+            current_mods = temp_mods;
+        }
+        
+        return result;
+    }
+};
