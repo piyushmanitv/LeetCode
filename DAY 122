@@ -1,0 +1,74 @@
+838. Push Dominoes
+Solved
+Medium
+Topics
+Companies
+There are n dominoes in a line, and we place each domino vertically upright. In the beginning, we simultaneously push some of the dominoes either to the left or to the right.
+
+After each second, each domino that is falling to the left pushes the adjacent domino on the left. Similarly, the dominoes falling to the right push their adjacent dominoes standing on the right.
+
+When a vertical domino has dominoes falling on it from both sides, it stays still due to the balance of the forces.
+
+For the purposes of this question, we will consider that a falling domino expends no additional force to a falling or already fallen domino.
+
+You are given a string dominoes representing the initial state where:
+
+dominoes[i] = 'L', if the ith domino has been pushed to the left,
+dominoes[i] = 'R', if the ith domino has been pushed to the right, and
+dominoes[i] = '.', if the ith domino has not been pushed.
+Return a string representing the final state.
+
+
+
+
+
+
+
+
+class Solution {
+public:
+    string pushDominoes(string dominoes) {
+        int i=0,j=0;
+        int n = dominoes.size();
+        while(i<n){
+            if(dominoes[i]!='.') i++;
+            else{
+                int j=i;
+                while(j<n && dominoes[j] == '.') j++;
+                int end = j;
+                j--;
+                char left,right;
+                if(i==0) left = 'L';
+                else if(i>0) left = dominoes[i-1];
+                if(j==n-1) right = 'R';
+                else if(j<n-1) right = dominoes[j+1];
+                while(i<j){
+                    if(left == 'L' && right == 'R'){
+                        break;
+                    } else if(left!='L' && right != 'R'){
+                        if(i>=0 && i<n) dominoes[i] = 'R';
+                        if(j>=0 && j<n) dominoes[j] = 'L';
+                        i++;
+                        j--;
+                    }else if(left == 'L' && right == 'L'){
+                        while(j>=0 && j>=i) {
+                            dominoes[j] = 'L';
+                            j--;
+                        }
+                        break;
+                    }else if(left == 'R' && right == 'R'){
+                        while(i<=j && i<n) {
+                            dominoes[i] = 'R';
+                            i++;
+                        }
+                        break;
+                    }
+                }
+                if(left == 'L' && right == 'L') dominoes[i] = 'L';
+                if(left == 'R' && right == 'R') dominoes[i] = 'R';
+                i= end;
+            }
+        }
+        return dominoes;
+    }
+};
