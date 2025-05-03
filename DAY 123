@@ -1,0 +1,40 @@
+1007. Minimum Domino Rotations For Equal Row
+Medium
+Topics
+Companies
+In a row of dominoes, tops[i] and bottoms[i] represent the top and bottom halves of the ith domino. (A domino is a tile with two numbers from 1 to 6 - one on each half of the tile.)
+
+We may rotate the ith domino, so that tops[i] and bottoms[i] swap values.
+
+Return the minimum number of rotations so that all the values in tops are the same, or all the values in bottoms are the same.
+
+If it cannot be done, return -1.
+
+
+
+
+
+
+
+
+
+
+
+class Solution {
+public:
+    int check(int x, vector<int>& A, vector<int>& B) {
+        int a = 0, b = 0;
+        for (int i = 0; i < A.size(); ++i) {
+            if (A[i] != x && B[i] != x) return INT_MAX;
+            if (A[i] != x) a++;
+            if (B[i] != x) b++;
+        }
+        return min(a, b);
+    }
+
+    int minDominoRotations(vector<int>& tops, vector<int>& bottoms) {
+        int res = min(check(tops[0], tops, bottoms), 
+                      check(bottoms[0], tops, bottoms));
+        return res == INT_MAX ? -1 : res;
+    }
+};
