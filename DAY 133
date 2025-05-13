@@ -1,0 +1,49 @@
+3335. Total Characters in String After Transformations I
+Solved
+Medium
+Topics
+Companies
+Hint
+You are given a string s and an integer t, representing the number of transformations to perform. In one transformation, every character in s is replaced according to the following rules:
+
+If the character is 'z', replace it with the string "ab".
+Otherwise, replace it with the next character in the alphabet. For example, 'a' is replaced with 'b', 'b' is replaced with 'c', and so on.
+Return the length of the resulting string after exactly t transformations.
+
+Since the answer may be very large, return it modulo 109 + 7.
+
+
+
+
+
+
+
+
+class Solution {
+public:
+    int MOD = 1000000007;
+    int runDp(vector<int>& dpZ, int now) {
+        if (now <= 0) {
+            return 1;
+        }
+        if (dpZ[now]) {
+            return dpZ[now];
+        }
+        return dpZ[now] = (runDp(dpZ, now - 26) + runDp(dpZ, now - 25)) % MOD;
+    }
+
+    int lengthAfterTransformations(string s, int t) {
+        int count[26] = {0};
+        for (int i = 0; i < s.length(); i++) {
+            count[s[i] - 'a']++;
+        }
+        vector<int> dpZ(t + 1, 0);
+        int ans = 0;
+        for (int i = 0; i < 26; i++) {
+            if (count[i]) {
+                ans = (ans + (long long)count[i] * runDp(dpZ, t - 25 + i)) % MOD;
+            }
+        }
+        return ans;
+    }
+};
