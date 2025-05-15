@@ -1,0 +1,32 @@
+2681. Power of Heroes
+Hard
+Topics
+Companies
+Hint
+You are given a 0-indexed integer array nums representing the strength of some heroes. The power of a group of heroes is defined as follows:
+
+Let i0, i1, ... ,ik be the indices of the heroes in a group. Then, the power of this group is max(nums[i0], nums[i1], ... ,nums[ik])2 * min(nums[i0], nums[i1], ... ,nums[ik]).
+Return the sum of the power of all non-empty groups of heroes possible. Since the sum could be very large, return it modulo 109 + 7.
+
+ 
+
+
+
+
+
+
+
+
+class Solution {
+public:
+    int sumOfPower(vector<int>& nums) {
+        const int Mod = 1000000007;
+        sort(nums.begin(), nums.end());
+        long long prev = 0, sum = 0;
+        for (int n : nums) {
+            sum = (sum + (1LL * n * n % Mod) * ((prev + n) % Mod) % Mod) % Mod;
+            prev = (prev * 2 + n) % Mod;
+        }
+        return (int)sum;
+    }
+};
