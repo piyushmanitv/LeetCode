@@ -1,0 +1,59 @@
+2222. Number of Ways to Select Buildings
+Medium
+Topics
+Companies
+Hint
+You are given a 0-indexed binary string s which represents the types of buildings along a street where:
+
+s[i] = '0' denotes that the ith building is an office and
+s[i] = '1' denotes that the ith building is a restaurant.
+As a city official, you would like to select 3 buildings for random inspection. However, to ensure variety, no two consecutive buildings out of the selected buildings can be of the same type.
+
+For example, given s = "001101", we cannot select the 1st, 3rd, and 5th buildings as that would form "011" which is not allowed due to having two consecutive buildings of the same type.
+Return the number of valid ways to select 3 buildings.
+
+
+
+
+
+
+
+
+
+
+ class Solution {
+public:
+int solveTabulation(string s){
+	int n = s.size(); 
+	vector<vector<long long>> dp1(3,vector<long long>(5,0));
+	vector<vector<long long>> dp2(3,vector<long long>(5,0));
+		for(int j=0;j<3;j++)
+			dp1[j][3] = 1; 
+	for(int index=n-1;index>=0;index--){
+		for(int prevChoosen=2;prevChoosen>=0;prevChoosen--){
+			for(int len=3;len>=0;len--){
+				long long notTake = dp1[prevChoosen][len];
+				long long take = 0;
+				if(prevChoosen!=s[index]-'0')
+					take = dp1[s[index]-'0'][len+1];
+				dp2[prevChoosen][len] = take+notTake;
+			}
+		} 
+		dp1 = dp2;
+	} 
+	return dp1[2][0]; 
+}
+long long solve(string s,int index,int prevChoosen,int len,vector<vector<vector<long long>>>&dp){
+	if(len==3) return 1;
+	if(index>=s.size()) return 0;
+	if(dp[index][prevChoosen][len]!=-1) return dp[index][prevChoosen][len];
+	int notTake = solve(s,index+1,prevChoosen,len,dp);
+	int take = 0;
+	if(prevChoosen!=s[index]-'0')
+		take = solve(s,index+1,s[index]-'0',len+1,dp);
+	return dp[index][prevChoosen][len] = take+notTake;
+}
+long long numberOfWays(string s) { 
+	return solveTabulation(s);
+    }
+};
