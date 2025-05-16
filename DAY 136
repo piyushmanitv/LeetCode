@@ -1,0 +1,80 @@
+2901. Longest Unequal Adjacent Groups Subsequence II
+Solved
+Medium
+Topics
+Companies
+Hint
+You are given a string array words, and an array groups, both arrays having length n.
+
+The hamming distance between two strings of equal length is the number of positions at which the corresponding characters are different.
+
+You need to select the longest subsequence from an array of indices [0, 1, ..., n - 1], such that for the subsequence denoted as [i0, i1, ..., ik-1] having length k, the following holds:
+
+For adjacent indices in the subsequence, their corresponding groups are unequal, i.e., groups[ij] != groups[ij+1], for each j where 0 < j + 1 < k.
+words[ij] and words[ij+1] are equal in length, and the hamming distance between them is 1, where 0 < j + 1 < k, for all indices in the subsequence.
+Return a string array containing the words corresponding to the indices (in order) in the selected subsequence. If there are multiple answers, return any of them.
+
+Note: strings in words may be unequal in length.
+
+
+
+
+
+
+
+
+
+class Solution {
+public:
+    vector<string> getWordsInLongestSubsequence(vector<string>& words, vector<int>& groups) {
+        int n = words.size();
+        vector<int> next(n, n), dp(n, 1);
+        unordered_map<long long, vector<int>> maskMap;
+        int bestStart = 0;
+
+        for (int i = n - 1; i >= 0; --i) {
+            const string& word = words[i];
+            int len = word.length();
+            long long fullMask = 0;
+            vector<long long> charMasks(len);
+ 
+            for (int j = 0; j < len; ++j) {
+                long long shift = (long long)(word[j] - 'a' + 1) << (5 * j);
+                charMasks[j] = shift;
+                fullMask |= shift;
+            }
+
+            int maxLen = 1;
+            int nextIndex = n;
+ 
+            for (int j = 0; j < len; ++j) {
+                long long alteredMask = fullMask ^ charMasks[j];
+                if (maskMap.count(alteredMask)) {
+                    for (int idx : maskMap[alteredMask]) {
+                        if (groups[i] != groups[idx] && dp[idx] + 1 > maxLen) {
+                            maxLen = dp[idx] + 1;
+                            nextIndex = idx;
+                        }
+                    }
+                }
+            }
+
+            dp[i] = maxLen;
+            next[i] = nextIndex;
+            if (dp[i] > dp[bestStart])
+                bestStart = i;
+ 
+            for (int j = 0; j < len; ++j) {
+                long long alteredMask = fullMask ^ charMasks[j];
+                maskMap[alteredMask].push_back(i);
+            }
+        }
+
+        vector<string> result;
+        for (int i = bestStart; i < n; i = next[i]) {
+            result.push_back(words[i]);
+        }
+
+        return result;
+    }
+};
