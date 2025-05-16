@@ -1,0 +1,102 @@
+3235. Check if the Rectangle Corner Is Reachable
+Solved
+Hard
+Topics
+Companies
+Hint
+You are given two positive integers xCorner and yCorner, and a 2D array circles, where circles[i] = [xi, yi, ri] denotes a circle with center at (xi, yi) and radius ri.
+
+There is a rectangle in the coordinate plane with its bottom left corner at the origin and top right corner at the coordinate (xCorner, yCorner). You need to check whether there is a path from the bottom left corner to the top right corner such that the entire path lies inside the rectangle, does not touch or lie inside any circle, and touches the rectangle only at the two corners.
+
+Return true if such a path exists, and false otherwise.
+
+
+
+
+
+
+
+
+
+
+
+
+#include <vector>
+#include <cmath>
+using namespace std;
+
+class Solution {
+    vector<vector<int>> circles;
+    int xCorner, yCorner;
+    vector<bool> vis;
+
+public:
+    bool canReachCorner(int xCorner, int yCorner, vector<vector<int>>& circles) {
+        int n = circles.size();
+        this->circles = circles;
+        this->xCorner = xCorner;
+        this->yCorner = yCorner;
+        vis.assign(n, false);
+
+        for (int i = 0; i < n; ++i) {
+            auto& c = circles[i];
+            int x = c[0], y = c[1], r = c[2];
+
+            if (inCircle(0, 0, x, y, r) || inCircle(xCorner, yCorner, x, y, r)) {
+                return false;
+            }
+
+            if (!vis[i] && crossLeftTop(x, y, r) && dfs(i)) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+private:
+    bool inCircle(long long x, long long y, long long cx, long long cy, long long r) {
+        return (x - cx) * (x - cx) + (y - cy) * (y - cy) <= r * r;
+    }
+
+    bool crossLeftTop(long long cx, long long cy, long long r) {
+        bool a = abs(cx) <= r && (cy >= 0 && cy <= yCorner);
+        bool b = abs(cy - yCorner) <= r && (cx >= 0 && cx <= xCorner);
+        return a || b;
+    }
+
+    bool crossRightBottom(long long cx, long long cy, long long r) {
+        bool a = abs(cx - xCorner) <= r && (cy >= 0 && cy <= yCorner);
+        bool b = abs(cy) <= r && (cx >= 0 && cx <= xCorner);
+        return a || b;
+    }
+
+    bool dfs(int i) {
+        auto& c = circles[i];
+        long long x1 = c[0], y1 = c[1], r1 = c[2];
+
+        if (crossRightBottom(x1, y1, r1)) {
+            return true;
+        }
+
+        vis[i] = true;
+
+        for (int j = 0; j < circles.size(); ++j) {
+            if (vis[j]) continue;
+
+            auto& c2 = circles[j];
+            long long x2 = c2[0], y2 = c2[1], r2 = c2[2];
+
+            if ((x1 - x2) * (x1 - x2) + (y1 - y2) * (y1 - y2) > (r1 + r2) * (r1 + r2)) {
+                continue;
+            }
+
+            if (x1 * r2 + x2 * r1 < (r1 + r2) * xCorner &&
+                y1 * r2 + y2 * r1 < (r1 + r2) * yCorner &&
+                dfs(j)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+};
