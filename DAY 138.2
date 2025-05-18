@@ -1,0 +1,66 @@
+1931. Painting a Grid With Three Different Colors
+Solved
+Hard
+Topics
+Companies
+Hint
+You are given two integers m and n. Consider an m x n grid where each cell is initially white. You can paint each cell red, green, or blue. All cells must be painted.
+
+Return the number of ways to color the grid with no two adjacent cells having the same color. Since the answer can be very large, return it modulo 109 + 7.
+
+
+
+
+
+
+
+
+
+
+#define ll long long
+const int MOD = 1e9 + 7;
+class Solution {
+public:
+    vector<int> idToState;
+    vector<int> moves = {0b001, 0b010, 0b100};
+    int path;
+    void dfs(int i, int m) {
+        if (i == m) {
+            idToState.push_back(path);
+            return;
+        }
+        int prev_move = path != 0 ? (path >> (3 * (i - 1))) : -1;
+        for (auto &move : moves) {
+            if (move != prev_move) {
+                int org = path;
+                path = path | (move << (3 * i));
+                dfs(i + 1, m);
+                path = org;
+            }
+        }
+    }
+    int colorTheGrid(int m, int n) {
+        dfs(0, m);
+        int K = idToState.size();
+        vector<ll> dp(K);
+        for (int j = 0; j < K; j++) dp[j] = 1;
+        for (int i = 1; i < n; i++) {
+            vector<ll> ndp(K);
+            for (int j = 0; j < K; j++) {
+                for (int p = 0; p < K; p++) {
+                    if ((idToState[j] & idToState[p]) == 0) {
+                        ndp[j] += dp[p]; 
+                        if (ndp[j] >= MOD) ndp[j] -= MOD;
+                    }
+                }
+            }
+            swap(dp, ndp);
+        }
+        ll ans = 0;
+        for (int i = 0; i < K; i++) {
+            ans += dp[i];
+            if (ans >= MOD) ans -= MOD;
+        }
+        return ans;
+    }
+};
