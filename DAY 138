@@ -1,0 +1,43 @@
+Q1. Smallest Index With Digit Sum Equal to Index
+Solved
+Easy
+3 pt.
+You are given an integer array nums.
+
+Return the smallest index i such that the sum of the digits of nums[i] is equal to i.
+
+If no such index exists, return -1.
+
+
+
+
+
+
+
+
+
+
+
+
+
+class Solution {
+public:
+    int smallestIndex(vector<int>& nums) {
+         
+        auto digitSum = [](int n) {
+            int sum = 0;
+            while (n) {
+                sum += n % 10;
+                n /= 10;
+            }
+            return sum;
+        };
+
+        for (int i = 0; i < nums.size(); ++i) {
+            if (digitSum(nums[i]) == i) {
+                return i;
+            }
+        }
+        return -1;
+    }
+};©leetcode
