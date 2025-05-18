@@ -1,0 +1,63 @@
+Q2. Minimum Swaps to Sort by Digit Sum
+Solved
+Medium
+4 pt.
+You are given an array nums of distinct positive integers. You need to sort the array in increasing order based on the sum of the digits of each number. If two numbers have the same digit sum, the smaller number appears first in the sorted order.
+
+Return the minimum number of swaps required to rearrange nums into this sorted order.
+
+A swap is defined as exchanging the values at two distinct positions in the array.
+
+
+
+
+
+
+
+
+
+
+
+class Solution {
+public:
+    int digitSum(int n) {
+        int sum = 0;
+        while (n) {
+            sum += n % 10;
+            n /= 10;
+        }
+        return sum;
+    }
+
+    int minSwaps(vector<int>& nums) {
+        int n = nums.size();
+        vector<tuple<int, int, int>> sortedWithIndex;
+        for (int i = 0; i < n; ++i) {
+            sortedWithIndex.emplace_back(digitSum(nums[i]), nums[i], i);
+        }
+
+        sort(sortedWithIndex.begin(), sortedWithIndex.end());
+        vector<bool> visited(n, false);
+        int swaps = 0;
+
+        for (int i = 0; i < n; ++i) {
+            if (visited[i] || get<2>(sortedWithIndex[i]) == i)
+                continue;
+
+            int cycle_size = 0;
+            int j = i;
+
+            while (!visited[j]) {
+                visited[j] = true;
+                j = get<2>(sortedWithIndex[j]);
+                cycle_size++;
+            }
+
+            if (cycle_size > 1)
+                swaps += (cycle_size - 1);
+        }
+
+        return swaps;
+    }
+};
+©leetcode
