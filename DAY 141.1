@@ -1,0 +1,40 @@
+128. Longest Consecutive Sequence
+Solved
+Medium
+Topics
+Companies
+Given an unsorted array of integers nums, return the length of the longest consecutive elements sequence.
+
+You must write an algorithm that runs in O(n) time.
+
+
+
+
+
+
+
+
+
+class Solution {
+public:
+    int longestConsecutive(vector<int>& arr) {
+        if (arr.empty()) return 0;
+
+        sort(arr.begin(), arr.end());
+        int longest = 1, current = 1;
+
+        for (int i = 1; i < arr.size(); i++) {
+            if (arr[i] == arr[i - 1]) {
+                
+                continue;
+            } else if (arr[i] == arr[i - 1] + 1) {
+                current++;
+            } else {
+                current = 1;
+            }
+            longest = max(longest, current);
+        }
+
+        return longest;
+    }
+};
