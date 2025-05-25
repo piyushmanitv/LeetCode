@@ -1,0 +1,46 @@
+2131. Longest Palindrome by Concatenating Two Letter Words
+Solved
+Medium
+Topics
+Companies
+Hint
+You are given an array of strings words. Each element of words consists of two lowercase English letters.
+
+Create the longest possible palindrome by selecting some elements from words and concatenating them in any order. Each element can be selected at most once.
+
+Return the length of the longest palindrome that you can create. If it is impossible to create any palindrome, return 0.
+
+A palindrome is a string that reads the same forward and backward.
+
+
+
+
+
+
+
+
+
+
+
+
+
+class Solution {
+public:
+    int longestPalindrome(vector<string>& words) {
+        int result = 0;
+        vector<vector<int>> freq(26, vector<int> (26, 0));
+
+        for(string &word:words){
+            freq[word[0]-'a'][word[1]-'a']++;
+        }
+
+        bool pickedOdd = false;
+        for(int i = 0; i < 26; i++){
+            for(int j = 0; j < i; j++) result += min(freq[i][j], freq[j][i]) * 4;
+            result += 4 * (freq[i][i] >> 1);
+            if(!pickedOdd && freq[i][i] % 2) pickedOdd = true, result += 2;
+        }
+
+        return result;
+    }
+};
