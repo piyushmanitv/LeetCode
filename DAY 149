@@ -1,0 +1,102 @@
+3373. Maximize the Number of Target Nodes After Connecting Trees II
+Solved
+Hard
+Topics
+premium lock icon
+Companies
+Hint
+There exist two undirected trees with n and m nodes, labeled from [0, n - 1] and [0, m - 1], respectively.
+
+You are given two 2D integer arrays edges1 and edges2 of lengths n - 1 and m - 1, respectively, where edges1[i] = [ai, bi] indicates that there is an edge between nodes ai and bi in the first tree and edges2[i] = [ui, vi] indicates that there is an edge between nodes ui and vi in the second tree.
+
+Node u is target to node v if the number of edges on the path from u to v is even. Note that a node is always target to itself.
+
+Return an array of n integers answer, where answer[i] is the maximum possible number of nodes that are target to node i of the first tree if you had to connect one node from the first tree to another node in the second tree.
+
+Note that queries are independent from each other. That is, for every query you will remove the added edge before proceeding to the next query.
+
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+#include <vector>
+#include <algorithm>
+using namespace std;
+
+class Solution {
+public:
+    vector<int> maxTargetNodes(vector<vector<int>>& edges1, vector<vector<int>>& edges2) {
+        vector<int> targets1 = computeTargets(edges1);
+        int offset = findMax(computeTargets(edges2));
+        for (int& val : targets1) {
+            val += offset;
+        }
+        return targets1;
+    }
+
+private:
+    int findMax(const vector<int>& values) {
+        int maximum = 0;
+        for (int val : values) {
+            maximum = max(maximum, val);
+        }
+        return maximum;
+    }
+
+    vector<int> computeTargets(const vector<vector<int>>& connections) {
+        int nodeCount = connections.size() + 1;
+        vector<int> edgeCount(nodeCount, 0);
+        vector<int> xorLink(nodeCount, 0);
+        vector<int> result(nodeCount, 1);
+        vector<int> stack(nodeCount);
+
+        for (const auto& pair : connections) {
+            int u = pair[0];
+            int v = pair[1];
+            edgeCount[u]++;
+            edgeCount[v]++;
+            xorLink[u] ^= v;
+            xorLink[v] ^= u;
+        }
+
+        int stackLength = 0;
+        for (int i = 0; i < nodeCount; ++i) {
+            if (edgeCount[i] == 1) {
+                stack[stackLength++] = i;
+            }
+        }
+
+        for (int i = 0; i < connections.size(); ++i) {
+            int current = stack[i];
+            int parent = xorLink[current];
+            xorLink[parent] ^= current;
+            result[parent] -= result[current];
+            if (--edgeCount[parent] == 1) {
+                stack[stackLength++] = parent;
+            }
+        }
+
+        int central = stack[nodeCount - 1];
+        result[central] = (nodeCount + result[central]) / 2;
+
+        for (int i = nodeCount - 2; i >= 0; --i) {
+            int current = stack[i];
+            result[current] = nodeCount - result[xorLink[current]];
+        }
+
+        return result;
+    }
+};
