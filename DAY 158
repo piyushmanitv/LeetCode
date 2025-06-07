@@ -1,0 +1,55 @@
+3170. Lexicographically Minimum String After Removing Stars
+Solved
+Medium
+Topics
+premium lock icon
+Companies
+You are given a string s. It may contain any number of '*' characters. Your task is to remove all '*' characters.
+
+While there is a '*', do the following operation:
+
+Delete the leftmost '*' and the smallest non-'*' character to its left. If there are several smallest characters, you can delete any of them.
+Return the lexicographically smallest resulting string after removing all '*' characters.
+
+
+
+
+
+
+
+
+
+
+
+
+class Solution {
+public:
+    string clearStars(string s) {
+
+        map<char, vector<int>> pos;
+        int n = s.size();
+        vector<int> removed(n , 0);
+        for(int i=0; i<n; i++){
+            if(s[i] == '*'){
+                for(auto & [ch, vecIndex]:pos){
+                    if(vecIndex.size()>0){
+                        int indexToBeRemoved = vecIndex[vecIndex.size()-1]; 
+                        vecIndex.pop_back();
+                        removed[i] = 1;
+                        removed[indexToBeRemoved] = 1;
+                        break;
+                    }
+                }
+            }else{
+                pos[s[i]].push_back(i);
+            }
+        }
+        string ans;
+        for(int i=0;i<n;i++){
+            if(!removed[i]){
+                ans.push_back(s[i]);
+            }
+        }
+        return ans;
+    }
+};
