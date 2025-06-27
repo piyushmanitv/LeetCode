@@ -1,0 +1,70 @@
+2014. Longest Subsequence Repeated k Times
+
+
+You are given a string s of length n, and an integer k. You are tasked to find the longest subsequence repeated k times in string s.
+
+A subsequence is a string that can be derived from another string by deleting some or no characters without changing the order of the remaining characters.
+
+A subsequence seq is repeated k times in the string s if seq * k is a subsequence of s, where seq * k represents a string constructed by concatenating seq k times.
+
+For example, "bba" is repeated 2 times in the string "bababcba", because the string "bbabba", constructed by concatenating "bba" 2 times, is a subsequence of the string "bababcba".
+Return the longest subsequence repeated k times in string s. If multiple such subsequences are found, return the lexicographically largest one. If there is no such subsequence, return an empty string.
+
+
+
+
+
+
+
+
+
+
+class Solution {
+public:
+    string longestSubsequenceRepeatedK(string s, int k) {
+        int n = s.size();
+       
+        int count[26]= {0};
+        for (auto a: s) count[a - 'a']++;
+        set<char> use;
+        for (int a = 0; a != 26; a++) {
+            if (count[a] >= k) use.insert(a + 'a');
+        }
+      
+        string s2;
+        for (auto a: s) if (use.find(a) != use.end()) s2.push_back(a);
+        vector<char> optc; vector<int> optn;
+        for (auto a = use.rbegin(); a != use.rend(); a++) {
+            optc.push_back(*a); 
+            optn.push_back(count[*a - 'a'] / k); 
+        }
+        string ans; string nw; int maxlen = min(7, (int)(s2.size() / k));
+        check_var(s2, optc, optn, ans, nw, k, maxlen);
+
+        return ans;
+    }
+    void check_var(string& s, vector<char>& optc, vector<int>& optn, string& ans, string& nw, int k, int maxlen) {
+        if (nw.size() > maxlen) return;
+        if (try_opt(nw, nw.size(), s, s.size(), k)) {
+            if (nw.size() > ans.size() || (nw.size() == ans.size() && nw > ans)) ans = nw;
+            nw.push_back(' ');
+            for (int i = 0; i != optc.size(); i++) {
+                    optn[i]--; nw.back() = optc[i];
+                    check_var(s, optc, optn, ans, nw, k, maxlen);
+                    optn[i]++;
+            }
+            nw.pop_back();
+        }
+    }
+    bool try_opt(string& opt, int n, string& s2, int ns2, int k) {
+        int j = 0;
+        for (int i = 0; i != k; i++) {
+            for (int t = 0; t != n; t++) {
+                while (j < ns2 && opt[t] != s2[j]) j++;
+                if (j >= ns2) return false;
+                j++;
+            }
+        }
+        return true;
+    }
+};
