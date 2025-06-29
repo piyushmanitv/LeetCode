@@ -1,0 +1,41 @@
+1498. Number of Subsequences That Satisfy the Given Sum Condition
+
+
+You are given an array of integers nums and an integer target.
+
+Return the number of non-empty subsequences of nums such that the sum of the minimum and maximum element on it is less or equal to target. Since the answer may be too large, return it modulo 109 + 7.
+
+
+
+
+
+
+
+
+
+class Solution {
+public:
+    int numSubseq(vector<int>& nums, int target) {
+        int n= nums.size();
+        int low=0;
+        int high = n-1;
+        int mod=1e9+7;
+        int count=0;
+        sort(nums.begin(), nums.end());
+        vector<int>power(n+1,1);
+        for(int i=1;i<=n;i++){
+            power[i]=power[i-1]*2;
+            power[i]=power[i]%mod;
+        }
+        while(low<=high){
+            if(nums[low]+nums[high]<=target){
+                count=(count+(power[high-low]))%mod;
+                low++;
+                if(high==n) break;
+            }
+           else high--;
+        }
+
+        return count;
+    }
+};
