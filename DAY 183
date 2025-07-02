@@ -1,0 +1,78 @@
+3333. Find the Original Typed String II
+
+
+Alice is attempting to type a specific string on her computer. However, she tends to be clumsy and may press a key for too long, resulting in a character being typed multiple times.
+
+You are given a string word, which represents the final output displayed on Alice's screen. You are also given a positive integer k.
+
+Return the total number of possible original strings that Alice might have intended to type, if she was trying to type a string of size at least k.
+
+Since the answer may be very large, return it modulo 109 + 7.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+class Solution {
+public:
+    int possibleStringCount(string word, int k) {
+        static constexpr int MOD = 1e9 + 7;
+        int n = word.length();
+        if (n < k) {
+            return 0;
+        }
+        if (n == k) {
+            return 1;
+        }
+
+        int total = 1;
+        std::vector<int> groups;
+        for (int cnt = 0, i = 0; i < n; ++i) {
+            ++cnt;
+            if (i == n - 1 || word[i] != word[i+1]) {
+                if (cnt > 1) {
+                    groups.push_back(cnt - 1);
+                }
+                total = 1LL * total * cnt % MOD; 
+                cnt = 0;
+                --k;  // 注意这里 k 的变化
+            }
+        }
+
+        if (k <= 0) {
+            return total;
+        }
+
+        // 正难则反：找出原始长度小于 K 的不合法方案的数量
+        int m = groups.size();
+        std::vector<int> dp(k);
+        dp[0] = 1;
+        std::vector<int> prefix(k);
+        for (int i = 0; i < m; ++i) {
+            prefix[0] = dp[0];
+            for (int j = 1; j < k; ++j) {
+                prefix[j] = (prefix[j-1] + dp[j]) % MOD;
+            }
+            for (int j = k - 1; j >= 0; --j) {
+                dp[j] = (prefix[j] - (j > groups[i] ? prefix[j - groups[i] - 1] : 0) + MOD) % MOD;
+            }
+        }
+        int lessK = 0;
+        for (int i = 0; i < k; ++i) {
+            lessK += dp[i];
+            lessK %= MOD;
+        }
+
+        return (total - lessK + MOD) % MOD;
+    }
+};
