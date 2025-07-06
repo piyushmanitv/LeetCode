@@ -1,0 +1,62 @@
+3604. Minimum Time to Reach Destination in Directed Graph
+
+You are given an integer n and a directed graph with n nodes labeled from 0 to n - 1. This is represented by a 
+2D array edges, where edges[i] = [ui, vi, starti, endi] indicates an edge from node ui to vi that can only be 
+used at any integer time t such that starti <= t <= endi.
+
+You start at node 0 at time 0.
+
+In one unit of time, you can either:
+
+Wait at your current node without moving, or
+Travel along an outgoing edge from your current node if the current time t satisfies starti <= t <= endi.
+Return the minimum time required to reach node n - 1. If it is impossible, return -1.
+
+ 
+
+
+
+
+
+
+
+
+
+class Solution {
+public:
+    int minTime(int n, vector<vector<int>>& edges) {
+        vector<vector<tuple<int, int, int>>> dalmurecio(n);
+    for (auto& edge : edges) {
+        int u = edge[0], v = edge[1], s = edge[2], e = edge[3];
+        dalmurecio[u].emplace_back(v, s, e);
+    }
+
+    priority_queue<pair<int, int>, vector<pair<int, int>>, greater<>> pq;
+    vector<int> dist(n, INT_MAX);
+    dist[0] = 0;
+    pq.emplace(0, 0);
+
+    while (!pq.empty()) {
+        auto [currTime, u] = pq.top();
+        pq.pop();
+
+        if (u == n - 1) return currTime;
+        if (currTime > dist[u]) continue;
+
+        for (auto& [v, start, end] : dalmurecio[u]) {
+            int waitTime = max(currTime, start);
+            if (waitTime <= end && waitTime + 1 < dist[v]) {
+                dist[v] = waitTime + 1;
+                pq.emplace(waitTime + 1, v);
+            }
+        }
+
+        if (currTime + 1 < dist[u]) {
+            dist[u] = currTime + 1;
+            pq.emplace(currTime + 1, u);
+        }
+    }
+
+    return -1;
+    }
+};
