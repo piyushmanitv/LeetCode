@@ -1,0 +1,38 @@
+3602. Hexadecimal and Hexatrigesimal Conversion
+
+
+You are given an integer n.
+
+Return the concatenation of the hexadecimal representation of n2 and the hexatrigesimal representation of n3.
+
+A hexadecimal number is defined as a base-16 numeral system that uses the digits 0 – 9 and the uppercase letters A - F to represent values from 0 to 15.
+
+A hexatrigesimal number is defined as a base-36 numeral system that uses the digits 0 – 9 and the uppercase letters A - Z to represent values from 0 to 35.
+
+
+
+
+
+
+
+
+
+
+class Solution {
+    string toBase(int n, int base, char* digits) {
+        if (n == 0)
+            return "0";
+        string res;
+        while (n) {
+            res = digits[n % base] + res;
+            n /= base;
+        }
+        return res;
+    }
+
+public:
+    string concatHex36(int n) {
+        return toBase(n * n, 16, "0123456789ABCDEF") +
+               toBase(n * n * n, 36, "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ");
+    }
+};
