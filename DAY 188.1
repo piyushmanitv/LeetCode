@@ -1,0 +1,55 @@
+3603. Minimum Cost Path with Alternating Directions II
+
+
+You are given two integers m and n representing the number of rows and columns of a grid, respectively.
+
+The cost to enter cell (i, j) is defined as (i + 1) * (j + 1).
+
+You are also given a 2D integer array waitCost where waitCost[i][j] defines the cost to wait on that cell.
+
+You start at cell (0, 0) at second 1.
+
+At each step, you follow an alternating pattern:
+
+On odd-numbered seconds, you must move right or down to an adjacent cell, paying its entry cost.
+On even-numbered seconds, you must wait in place, paying waitCost[i][j].
+Return the minimum total cost required to reach (m - 1, n - 1).
+
+
+
+
+
+
+
+
+
+
+
+class Solution {
+public:
+    long long minCost(int m, int n, vector<vector<int>>& w) {
+        vector<long long> dp(n, 0);
+        
+        auto entry = [&](int i, int j) {
+            return 1LL * (i+1) * (j+1);
+        };
+        
+        dp[0] = entry(0,0);
+        for (int j = 1; j < n; ++j) {
+            long long waitExtra = (j == n-1 && m == 1 ? 0 : w[0][j]);
+            dp[j] = dp[j-1] + entry(0,j) + waitExtra;
+        }
+        
+        for (int i = 1; i < m; ++i) {
+            long long waitExtra0 = (i == m-1 && n == 1 ? 0 : w[i][0]);
+            dp[0] = dp[0] + entry(i,0) + waitExtra0;
+            for (int j = 1; j < n; ++j) {
+                long long bestPrev = min(dp[j], dp[j-1]);
+                long long waitExtra = (i == m-1 && j == n-1 ? 0 : w[i][j]);
+                dp[j] = bestPrev + entry(i,j) + waitExtra;
+            }
+        }
+        
+        return dp[n-1];
+    }
+};
