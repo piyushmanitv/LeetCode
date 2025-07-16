@@ -1,0 +1,44 @@
+3201. Find the Maximum Length of Valid Subsequence I
+
+
+You are given an integer array nums.
+A subsequence sub of nums with length x is called valid if it satisfies:
+
+(sub[0] + sub[1]) % 2 == (sub[1] + sub[2]) % 2 == ... == (sub[x - 2] + sub[x - 1]) % 2.
+Return the length of the longest valid subsequence of nums.
+
+A subsequence is an array that can be derived from another array by deleting some or no elements without changing the order of the remaining elements.
+
+
+
+
+
+
+
+
+
+
+
+class Solution {
+public:
+    int maximumLength(vector<int>& nums) {
+        if (nums.empty()) return 0;
+
+        int oddCount = 0, evenCount = 0, alternating = 0;
+        bool expectOdd = nums[0] % 2 == 1;
+
+        for (int n : nums) {
+            bool isOdd = n % 2 == 1;
+
+            if (isOdd == expectOdd) {
+                ++alternating;
+                expectOdd = !expectOdd;
+            }
+
+            if (isOdd) ++oddCount;
+            else ++evenCount;
+        }
+
+        return max({oddCount, evenCount, alternating});
+    }
+};
