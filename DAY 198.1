@@ -1,0 +1,38 @@
+1599. Maximum Profit of Operating a Centennial Wheel
+
+
+You are the operator of a Centennial Wheel that has four gondolas, and each gondola has room for up to four people. You have the ability to rotate the gondolas counterclockwise, which costs you runningCost dollars.
+
+You are given an array customers of length n where customers[i] is the number of new customers arriving just before the ith rotation (0-indexed). This means you must rotate the wheel i times before the customers[i] customers arrive. You cannot make customers wait if there is room in the gondola. Each customer pays boardingCost dollars when they board on the gondola closest to the ground and will exit once that gondola reaches the ground again.
+
+You can stop the wheel at any time, including before serving all customers. If you decide to stop serving customers, all subsequent rotations are free in order to get all the customers down safely. Note that if there are currently more than four customers waiting at the wheel, only four will board the gondola, and the rest will wait for the next rotation.
+
+Return the minimum number of rotations you need to perform to maximize your profit. If there is no scenario where the profit is positive, return -1.
+
+
+
+
+
+
+
+
+
+
+
+class Solution {
+public:
+    int minOperationsMaxProfit(vector<int>& cust, int boardingCost, int runningCost) {
+    int wait = 0, prof = 0, max_prof = 0, max_i = -1;
+    for (int i = 0; i < cust.size() || wait > 0; ++i) {
+        if (i < cust.size())
+            wait += cust[i];
+        prof += min(4, wait) * boardingCost - runningCost;
+        wait -= min(4, wait);
+        if (max_prof < prof) {
+            max_prof = prof;
+            max_i = i + 1;
+        }
+    }
+    return max_i;
+}
+};
