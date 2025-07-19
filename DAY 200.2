@@ -1,0 +1,62 @@
+3619. Count Islands With Total Value Divisible by K
+Solved
+Medium
+premium lock icon
+Companies
+Hint
+You are given an m x n matrix grid and a positive integer k. An island is a group of positive integers (representing land) that are 4-directionally connected (horizontally or vertically).
+
+The total value of an island is the sum of the values of all cells in the island.
+
+Return the number of islands with a total value divisible by k.
+
+
+
+
+
+
+
+
+
+
+class Solution {
+public:
+    int m, n, k;
+    
+    vector<int> dx = {-1, 1, 0, 0};
+    vector<int> dy = {0, 0, -1, 1};
+
+    long long dfs(vector<vector<int>>& grid, int x, int y) {
+        if (x < 0 || x >= m || y < 0 || y >= n || grid[x][y] <= 0) return 0;
+
+        long long val = grid[x][y];
+        grid[x][y] = 0;
+
+        for (int dir = 0; dir < 4; ++dir) {
+            int nx = x + dx[dir], ny = y + dy[dir];
+            val += dfs(grid, nx, ny);
+        }
+
+        return val;
+    }
+
+    int countIslands(vector<vector<int>>& grid, int k) {
+        this->m = grid.size();
+        this->n = grid[0].size();
+        this->k = k;
+
+        int count = 0;
+
+        for (int i = 0; i < m; ++i) {
+            for (int j = 0; j < n; ++j) {
+                if (grid[i][j] > 0) {
+                    long long total = dfs(grid, i, j);
+                    if (total % k == 0) {
+                        ++count;
+                    }
+                }
+            }
+        }
+        return count;
+    }
+};
