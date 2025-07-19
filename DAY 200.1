@@ -1,0 +1,60 @@
+3618. Split Array by Prime Indices
+Solved
+Medium
+premium lock icon
+Companies
+Hint
+You are given an integer array nums.
+
+Split nums into two arrays A and B using the following rule:
+
+Elements at prime indices in nums must go into array A.
+All other elements must go into array B.
+Return the absolute difference between the sums of the two arrays: |sum(A) - sum(B)|.
+
+A prime number is a natural number greater than 1 with only two factors, 1 and itself.
+
+Note: An empty array has a sum of 0.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+class Solution {
+public:
+    long long splitArray(vector<int>& nums) {
+        int n = nums.size();
+        vector<bool> isPrime(n, true);
+
+        isPrime[0] = false;
+        if (n > 1) isPrime[1] = false;
+
+        for (int i = 2; i * i < n; ++i) {
+            if (isPrime[i]) {
+                for (int j = i * i; j < n; j += i) {
+                    isPrime[j] = false;
+                }
+            }
+        }
+
+        long long sumA = 0, sumB = 0;
+        for (int i = 0; i < n; ++i) {
+            if (isPrime[i]) {
+                sumA += nums[i];
+            } else {
+                sumB += nums[i];
+            }
+        }
+        return abs(sumA - sumB);
+    }
+};
