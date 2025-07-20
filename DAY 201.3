@@ -1,0 +1,115 @@
+1948. Delete Duplicate Folders in System
+Solved
+Hard
+Topics
+premium lock icon
+Companies
+Hint
+Due to a bug, there are many duplicate folders in a file system. You are given a 2D array paths, where paths[i] is an array representing an absolute path to the ith folder in the file system.
+
+For example, ["one", "two", "three"] represents the path "/one/two/three".
+Two folders (not necessarily on the same level) are identical if they contain the same non-empty set of identical subfolders and underlying subfolder structure. The folders do not need to be at the root level to be identical. If two or more folders are identical, then mark the folders as well as all their subfolders.
+
+For example, folders "/a" and "/b" in the file structure below are identical. They (as well as their subfolders) should all be marked:
+/a
+/a/x
+/a/x/y
+/a/z
+/b
+/b/x
+/b/x/y
+/b/z
+However, if the file structure also included the path "/b/w", then the folders "/a" and "/b" would not be identical. Note that "/a/x" and "/b/x" would still be considered identical even with the added folder.
+Once all the identical folders and their subfolders have been marked, the file system will delete all of them. The file system only runs the deletion once, so any folders that become identical after the initial deletion are not deleted.
+
+Return the 2D array ans containing the paths of the remaining folders after deleting all the marked folders. The paths may be returned in any order.
+
+
+
+
+
+
+
+
+
+
+
+template <class T> inline void hash_combine(std::size_t& seed, const T& v) {
+    std::hash<T> hasher;
+    seed ^= hasher(v) + 0x9e3779b9 + (seed << 6) + (seed >> 2);
+}
+
+class Solution {
+    struct Node {
+        std::string_view name;
+        std::map<std::string_view, std::unique_ptr<Node>> children;
+        bool marked{false};
+
+        std::size_t
+        hash(std::unordered_map<std::size_t, std::vector<Node*>>& dir) {
+            if (children.size() == 0)
+                return 0;
+            std::size_t ourHash = 0;
+            for (const auto& child : children) {
+                hash_combine(ourHash, child.first);
+                auto theirHash = child.second->hash(dir);
+                hash_combine(ourHash, theirHash);
+            }
+
+            dir[ourHash].emplace_back(this);
+            return ourHash;
+        }
+
+        void pushOut(std::vector<std::vector<std::string>>& dirs,
+                     std::vector<std::string>& cur) {
+            if (marked)
+                return;
+
+            if (name != "/")
+                dirs.push_back(cur);
+
+            for (const auto& [cName, child] : children) {
+                cur.emplace_back(cName);
+                child->pushOut(dirs, cur);
+                cur.pop_back();
+            }
+        }
+    };
+
+public:
+    static std::vector<std::vector<std::string>>
+    deleteDuplicateFolder(const std::vector<std::vector<std::string>>& paths) {
+        Node root{"/"sv};
+
+        for (const auto& path : paths) {
+            Node* cur = &root;
+            for (const auto& dir : path) {
+                if (auto it = cur->children.find(dir);
+                    it != cur->children.end()) {
+                    cur = it->second.get();
+                    continue;
+                }
+
+                auto newNode = std::make_unique<Node>(dir);
+                auto hey = newNode.get();
+                cur->children.emplace(dir, std::move(newNode));
+                cur = hey;
+            }
+        }
+        std::unordered_map<std::size_t, std::vector<Node*>> groups;
+        root.hash(groups);
+
+        for (const auto& [hash, group] : groups) {
+            if (group.size() < 2)
+                continue;
+
+            for (const auto& node : group)
+                node->marked = true;
+        }
+
+        std::vector<std::vector<std::string>> out;
+        std::vector<std::string> tmp;
+        root.pushOut(out, tmp);
+        return out;
+    }
+};
