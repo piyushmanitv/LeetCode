@@ -1,0 +1,56 @@
+Q2. Count Number of Trapezoids I
+Solved
+Medium
+4 pt.
+You are given a 2D integer array points, where points[i] = [xi, yi] represents the coordinates of the ith point on the Cartesian plane.
+
+A horizontal trapezoid is a convex quadrilateral with at least one pair of horizontal sides (i.e. parallel to the x-axis). Two lines are parallel if and only if they have the same slope.
+
+Return the number of unique horizontal trapezoids that can be formed by choosing any four distinct points from points.
+
+Since the answer may be very large, return it modulo 109 + 7.©leetcode
+
+
+
+
+
+
+
+
+
+class Solution {
+public:
+    const int MOD = 1e9 + 7;
+
+    long long comb2(int n) {
+        if (n < 2) return 0;
+        return 1LL * n * (n - 1) / 2;
+    }
+
+    int countTrapezoids(vector<vector<int>>& points) {
+        unordered_map<int, int> yCount;
+
+        for (auto& p : points) {
+            yCount[p[1]]++;
+        }
+
+        vector<long long> cList;
+        for (auto& [y, cnt] : yCount) {
+            long long c = comb2(cnt);
+            if (c > 0) cList.push_back(c);
+        }
+
+        long long sum = 0, sumSq = 0;
+        for (auto& c : cList) {
+            sum = (sum + c) % MOD;
+            sumSq = (sumSq + (c * c) % MOD) % MOD;
+        }
+
+        long long result = ((sum * sum) % MOD - sumSq + MOD) % MOD;
+        result = (result * ((MOD + 1) / 2)) % MOD;
+
+        return (int)result;
+    }
+};
+
+©leetcode
