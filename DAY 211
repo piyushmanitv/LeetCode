@@ -1,0 +1,40 @@
+2419. Longest Subarray With Maximum Bitwise AND
+
+
+You are given an integer array nums of size n.
+
+Consider a non-empty subarray from nums that has the maximum possible bitwise AND.
+
+In other words, let k be the maximum value of the bitwise AND of any subarray of nums. Then, only subarrays with a bitwise AND equal to k should be considered.
+Return the length of the longest such subarray.
+
+The bitwise AND of an array is the bitwise AND of all the numbers in it.
+
+A subarray is a contiguous sequence of elements within an array.
+
+
+
+
+
+
+
+class Solution {
+public:
+    int longestSubarray(vector<int>& nums) {
+        int n = nums.size();
+        int len = 0;
+        int maxn = *max_element(nums.begin(),nums.end()); 
+        int count =0;
+        for(int i=0;i<n;i++){ 
+            if(nums[i]==maxn){
+                count++; 
+            }
+            else{
+                len = max(len, count);
+                count=0;
+            }
+        }
+        len = max(len, count);
+        return len;
+    }
+};
