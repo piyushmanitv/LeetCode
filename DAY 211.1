@@ -1,0 +1,50 @@
+2719. Count of Integers
+ 
+You are given two numeric strings num1 and num2 and two integers max_sum and min_sum. We denote an integer x to be good if:
+
+num1 <= x <= num2
+min_sum <= digit_sum(x) <= max_sum.
+Return the number of good integers. Since the answer may be large, return it modulo 109 + 7.
+
+Note that digit_sum(x) denotes the sum of the digits of x.
+
+
+
+
+
+
+
+
+
+
+class Solution {
+    int mod=1e9+7;
+    int dp[23][210][2][2];
+public:
+    int makeNums(int idx, int leq, int heq,int sum, const string& lo, const string& hi, const int& minSum, const int& maxSum) {
+        if(idx==lo.length()){
+            return sum >=minSum && sum<=maxSum;
+        }
+        if(dp[idx][sum][leq][heq]!=-1)
+        return dp[idx][sum][leq][heq];
+        char st='0';
+        if(leq){
+            st = lo[idx];
+        }
+        char end='9';
+        if(heq){
+            end = hi[idx];
+        }
+        long long val=0;
+        for(char i=st;i<=end;i++){
+            val = (val + makeNums(idx+1,leq && (i==lo[idx]), heq && (i==hi[idx]),sum + (i-'0'),lo,hi,minSum,maxSum))%mod;
+        }
+        return dp[idx][sum][leq][heq]=val;
+    }
+    int count(string num1, string num2, int min_sum, int max_sum) { 
+        memset(dp,-1,sizeof(dp));
+        num1 = string(num2.length()-num1.length(),'0') + num1;
+        return makeNums(0,1,1,0,num1,num2,min_sum, max_sum);
+
+    }
+};
