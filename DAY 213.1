@@ -1,0 +1,36 @@
+456. 132 Pattern
+
+Given an array of n integers nums, a 132 pattern is a subsequence of three integers nums[i], nums[j] and nums[k] such that i < j < k and nums[i] < nums[k] < nums[j].
+
+Return true if there is a 132 pattern in nums, otherwise, return false.
+
+
+
+
+
+
+
+
+
+class Solution {
+public: 
+    static bool find132pattern(vector<int> const& nums) {
+        if (nums.size() < 3) return false;
+        ssize_t const ns = nums.size();
+        
+        vector<int> decr_stack;
+        int mid_val{INT_MIN};
+        for (ssize_t i{ns-1}; i >= 0; --i){
+            auto const &cur_val = nums[i];
+            if (cur_val < mid_val){
+                return true;
+            }
+            while (not decr_stack.empty() and decr_stack.back() < cur_val){
+                mid_val = decr_stack.back();
+                decr_stack.pop_back();
+            }
+            decr_stack.push_back(cur_val);
+        }
+        return false;
+    }
+};
