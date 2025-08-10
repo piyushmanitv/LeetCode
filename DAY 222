@@ -1,0 +1,33 @@
+869. Reordered Power of 2
+Medium
+Topics
+premium lock icon
+Companies
+You are given an integer n. We reorder the digits in any order (including the original order) such that the leading digit is not zero.
+
+Return true if and only if we can do this so that the resulting number is a power of two.
+
+
+
+
+
+
+class Solution {
+public:
+    bool reorderedPowerOf2(int n) {
+        string s = sortDigits(n);
+
+        for(int i = 0; i<31; i++){
+            int power = 1 << i;
+            if(s == sortDigits(power)){
+                return true;
+            }
+        }
+        return false;
+    }
+        string sortDigits(int num) {
+        string s = to_string(num);
+        sort(s.begin(), s.end());
+        return s;
+    }
+};
