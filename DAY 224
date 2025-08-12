@@ -1,0 +1,67 @@
+2787. Ways to Express an Integer as Sum of Powers
+
+Given two positive integers n and x.
+
+Return the number of ways n can be expressed as the sum of the xth power of unique positive integers, in other words, the number of sets of unique integers [n1, n2, ..., nk] where n = n1x + n2x + ... + nkx.
+
+Since the result can be very large, return it modulo 109 + 7.
+
+For example, if n = 160 and x = 3, one way to express n is n = 23 + 33 + 53.
+
+
+
+
+
+
+
+
+#include <vector>
+using namespace std;
+
+class Solution {
+    static constexpr int MOD = 1e9 + 7;
+    static constexpr int MAX_N = 300;
+    static constexpr int MAX_X = 5;
+    static vector<vector<int>> precomputed;
+
+    static int ipow(int base, int exp) {
+        int res = 1;
+        while (exp--) res *= base;
+        return res;
+    }
+    static vector<vector<int>> compute() {
+        vector<vector<int>> ans(MAX_N + 1, vector<int>(MAX_X + 1, 0));
+
+        for (int x = 1; x <= MAX_X; ++x) {
+            vector<vector<int>> dp(MAX_N + 1, vector<int>(MAX_N + 1, 0));
+            dp[0][0] = 1;
+
+            for (int i = 1; ; ++i) {
+                int p = ipow(i, x);
+                if (p > MAX_N) break;
+                for (int s = MAX_N; s >= p; --s) {
+                    for (int k = 0; k < MAX_N; ++k) {
+                        dp[s][k+1] = (dp[s][k+1] + dp[s - p][k]) % MOD;
+                    }
+                }
+            }
+
+            for (int s = 0; s <= MAX_N; ++s) {
+                long long total = 0;
+                for (int k = 0; k <= MAX_N; ++k) {
+                    total = (total + dp[s][k]) % MOD;
+                }
+                ans[s][x] = (int)total;
+            }
+        }
+
+        return ans;
+    }
+
+public:
+    int numberOfWays(int n, int x) {
+        return precomputed[n][x];
+    }
+};
+
+vector<vector<int>> Solution::precomputed = Solution::compute();
