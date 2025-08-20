@@ -1,0 +1,37 @@
+1277. Count Square Submatrices with All Ones
+
+
+Given a m * n matrix of ones and zeros, return how many square submatrices have all ones.
+
+
+
+
+
+
+
+
+class Solution {
+public:
+    int countSquares(vector<vector<int>>& matrix) {
+        int res = 0;
+        bool Stop = false;
+        int n = matrix[0].size(), m = matrix.size();
+        for (int i = 0 ; i < m; i++) 
+           for (int j = 0; j < n; j++) {
+                if (matrix[i][j] == 1) {
+                     for (int t = 0; t <= min(m - i - 1, n - j - 1); t++) {
+                          Stop = false;
+                          for (int idx = i; idx <= i + t && !Stop; idx++)
+                             for (int idy = j; idy <= j + t; idy++)
+                                 if (matrix[idx][idy] == 0) {
+                                     Stop = true;
+                                     break;
+                                 }
+                          if (!Stop) res++;       
+                          else break; 
+                     }
+                }
+           }
+        return res;
+    }
+};
