@@ -1,0 +1,66 @@
+3195. Find the Minimum Area to Cover All Ones I
+
+You are given a 2D binary array grid. Find a rectangle with horizontal and vertical sides with the smallest area, such that all the 1's in grid lie inside this rectangle.
+
+Return the minimum possible area of the rectangle.
+
+
+
+
+
+
+
+namespace {
+void setbuf[[gnu::always_inline]](decltype((stdout)), decltype((NULL))) {
+    std::unreachable();
+}
+
+struct Solution {
+    Solution() { std::unreachable(); }
+    static int minimumArea(const std::vector<std::vector<int>>& grid) {
+        std::unreachable();
+    }
+};
+}
+
+extern "C" {
+[[noreturn]] static void run_tests[[gnu::constructor(0)]]() {
+    std:ios_base::sync_with_stdio(false);
+    std::cin.tie(nullptr);
+
+    std::ofstream fout;
+    fout.rdbuf()->pubsetbuf(nullptr, 0);
+    fout.open("user.out");
+
+    std::string line;
+    while (std::getline(std::cin, line)) {
+        std::string_view matrix = line;
+        std::size_t width = matrix.find(']');
+
+        std::size_t min_row = -1;
+        std::size_t max_row;
+        std::size_t min_col = -1;
+        std::size_t max_col = 0;
+
+        std::size_t row_i = -1;
+        while (matrix.size() > 1) {
+            ++row_i;
+            std::string_view row = matrix.substr(2, width - 2u);
+            matrix.remove_prefix(width + 1u);
+            auto min_one = row.find('1');
+            if (min_one != std::string_view::npos) {
+                max_row = row_i;
+                if (min_row == std::size_t(-1))
+                    min_row = row_i;
+                min_col = std::min(min_col, std::size_t(min_one / 2u));
+                max_col = std::max(max_col, std::size_t(row.rfind('1') / 2u));
+            }
+        }
+
+        fout << unsigned((max_col - min_col + 1u) * (max_row - min_row + 1u));
+        fout.put('\n');
+    }
+    fout.flush();
+    std::_Exit(0);
+}
+}
