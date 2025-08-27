@@ -1,0 +1,107 @@
+3459. Length of Longest V-Shaped Diagonal Segment
+
+
+You are given a 2D integer matrix grid of size n x m, where each element is either 0, 1, or 2.
+
+A V-shaped diagonal segment is defined as:
+
+The segment starts with 1.
+The subsequent elements follow this infinite sequence: 2, 0, 2, 0, ....
+The segment:
+Starts along a diagonal direction (top-left to bottom-right, bottom-right to top-left, top-right to bottom-left, or bottom-left to top-right).
+Continues the sequence in the same diagonal direction.
+Makes at most one clockwise 90-degree turn to another diagonal direction while maintaining the sequence.
+
+
+Return the length of the longest V-shaped diagonal segment. If no valid segment exists, return 0.
+
+
+
+
+
+
+
+
+
+class Solution {
+public: 
+    int getNext(int d) {
+        if (d == 0) return 3;  
+        if (d == 1) return 2;  
+        if (d == 2) return 0;  
+        return 1;             
+    }
+     
+    int getCurr(int d) {
+        if (d == 0) return 1;  
+        if (d == 1) return 0;  
+        if (d == 2) return 3;  
+        return 2;            
+    }
+    
+    int lenOfVDiagonal(vector<vector<int>>& grid) {
+        int n = grid.size(), m = grid[0].size(); 
+        vector<vector<array<int, 4>>> dp(n, vector<array<int, 4>>(m, {0, 0, 0, 0}));
+         
+        vector<pair<int, int>> dirs = {{-1,-1}, {1,1}, {1,-1}, {-1,1}};
+ 
+        for (int i = 1; i < n; i++) {
+            for (int j = 1; j < m; j++) {
+                if (grid[i][j] != 1 && grid[i - 1][j - 1] != 1 && grid[i - 1][j - 1] != grid[i][j]) {
+                    dp[i][j][0] = dp[i - 1][j - 1][0] + 1;
+                }
+            }
+        }
+ 
+        for (int i = n - 2; i >= 0; i--) {
+            for (int j = m - 2; j >= 0; j--) {
+                if (grid[i][j] != 1 && grid[i + 1][j + 1] != 1 && grid[i + 1][j + 1] != grid[i][j]) {
+                    dp[i][j][1] = dp[i + 1][j + 1][1] + 1;
+                }
+            }
+        }
+ 
+        for (int i = n - 2; i >= 0; i--) {
+            for (int j = 1; j < m; j++) {
+                if (grid[i][j] != 1 && grid[i + 1][j - 1] != 1 && grid[i + 1][j - 1] != grid[i][j]) {
+                    dp[i][j][2] = dp[i + 1][j - 1][2] + 1;
+                }
+            }
+        }
+ 
+        for (int i = 1; i < n; i++) {
+            for (int j = m - 2; j >= 0; j--) {
+                if (grid[i][j] != 1 && grid[i - 1][j + 1] != 1 && grid[i - 1][j + 1] != grid[i][j]) {
+                    dp[i][j][3] = dp[i - 1][j + 1][3] + 1;
+                }
+            }
+        }
+
+        int maxV = 0;  
+         
+        for (int i = 0; i < n; i++) {
+            for (int j = 0; j < m; j++) {
+                if (grid[i][j] != 1) continue;  
+                maxV = max(maxV, 1);
+ 
+                for (int d = 0; d < 4; d++) {
+                    int nextDir = getNext(d); 
+                    int currDir = getCurr(d);  
+                    auto& dir = dirs[d];
+
+                    int ci = i + dir.first, cj = j + dir.second;
+                    if (ci < 0 || cj < 0 || ci >= n || cj >= m || grid[ci][cj] != 2) continue;
+ 
+                    while (ci >= 0 && cj >= 0 && ci < n && cj < m && grid[ci][cj] != grid[ci-dir.first][cj-dir.second] && grid[ci][cj] != 1) {
+                        maxV = max(maxV, dp[ci][cj][nextDir] + dp[ci][cj][currDir] + 2);
+                        
+                        ci += dir.first;
+                        cj += dir.second;
+                    }
+                }                
+            }
+        }
+
+        return maxV;
+    }
+};
