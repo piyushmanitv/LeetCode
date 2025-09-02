@@ -1,0 +1,47 @@
+3025. Find the Number of Ways to Place People I
+Medium
+Topics
+premium lock icon
+Companies
+Hint
+You are given a 2D array points of size n x 2 representing integer coordinates of some points on a 2D plane, where points[i] = [xi, yi].
+
+Count the number of pairs of points (A, B), where
+
+A is on the upper left side of B, and
+there are no other points in the rectangle (or line) they make (including the border).
+Return the count.
+
+
+
+
+
+
+
+
+
+
+class Solution {
+public:
+    int numberOfPairs(vector<vector<int>>& points) {
+        sort(points.begin(), points.end(),
+            [](vector<int>& a, vector<int>& b) {
+                if (a[0] - b[0]) return a[0] < b[0];
+                return a[1] > b[1];
+            ;});
+        
+        int minY, pairCt = 0;
+        for (int i = 0; i < points.size(); i++) {
+            minY = INT32_MIN;
+            for (int j = i + 1; minY < points[i][1] && j < points.size(); j++) {
+                if (points[i][1] < points[j][1] || points[j][1] <= minY) {
+                    continue;
+                } else {
+                    pairCt++;
+                    minY = points[j][1];
+                }
+            }
+        }
+        return pairCt;
+    }
+};
