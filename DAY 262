@@ -1,0 +1,75 @@
+3484. Design Spreadsheet
+Solved
+Medium
+Topics
+premium lock icon
+Companies
+Hint
+A spreadsheet is a grid with 26 columns (labeled from 'A' to 'Z') and a given number of rows. Each cell in the spreadsheet can hold an integer value between 0 and 105.
+
+Implement the Spreadsheet class:
+
+Spreadsheet(int rows) Initializes a spreadsheet with 26 columns (labeled 'A' to 'Z') and the specified number of rows. All cells are initially set to 0.
+void setCell(String cell, int value) Sets the value of the specified cell. The cell reference is provided in the format "AX" (e.g., "A1", "B10"), where the letter represents the column (from 'A' to 'Z') and the number represents a 1-indexed row.
+void resetCell(String cell) Resets the specified cell to 0.
+int getValue(String formula) Evaluates a formula of the form "=X+Y", where X and Y are either cell references or non-negative integers, and returns the computed sum.
+Note: If getValue references a cell that has not been explicitly set using setCell, its value is considered 0.
+
+
+
+
+
+
+
+
+
+int buffer[26000];
+
+class Spreadsheet {
+    int getNumber(const string &cell, int &p) {
+        int num = 0;
+        while (cell[p] >= '0' && cell[p] <= '9') num = num * 10 + cell[p++] - '0';
+        return num;
+    }
+
+    int &getCell(const string &cell, int &p) {
+        int col = cell[p++] - 'A', row = getNumber(cell, p)-1;
+        return buffer[row*26 + col];
+    }
+
+    int getCellOrConst(const string &cell, int &p) {
+        if (cell[p] >= '0' && cell[p] <= '9') return getNumber(cell, p);
+        return getCell(cell, p);
+    }
+
+public:
+    Spreadsheet(int rows) {
+        memset(buffer, 0, rows*26*sizeof *buffer);
+    }
+    
+    void setCell(const string &cell, int value) {
+        int p = 0;
+        getCell(cell, p) = value;
+    }
+    
+    void resetCell(const string &cell) {
+        setCell(cell, 0);
+    }
+    
+    int getValue(const string &formula) {
+        int pos = 0;
+        if (formula[pos++] != '=') cout << "Should start by '=' : " << formula << endl;
+        int a = getCellOrConst(formula, pos);
+        if (formula[pos++] != '+') cout << "Should split by '+' : " << formula << endl;
+        int b = getCellOrConst(formula, pos);
+        return a+b;
+    }
+};
+
+/**
+ * Your Spreadsheet object will be instantiated and called as such:
+ * Spreadsheet* obj = new Spreadsheet(rows);
+ * obj->setCell(cell,value);
+ * obj->resetCell(cell);
+ * int param_3 = obj->getValue(formula);
+ */
