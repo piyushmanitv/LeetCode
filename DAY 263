@@ -1,0 +1,106 @@
+3508. Implement Router
+ 
+Design a data structure that can efficiently manage data packets in a network router. Each data packet consists of the following attributes:
+
+source: A unique identifier for the machine that generated the packet.
+destination: A unique identifier for the target machine.
+timestamp: The time at which the packet arrived at the router.
+Implement the Router class:
+
+Router(int memoryLimit): Initializes the Router object with a fixed memory limit.
+
+memoryLimit is the maximum number of packets the router can store at any given time.
+If adding a new packet would exceed this limit, the oldest packet must be removed to free up space.
+bool addPacket(int source, int destination, int timestamp): Adds a packet with the given attributes to the router.
+
+A packet is considered a duplicate if another packet with the same source, destination, and timestamp already exists in the router.
+Return true if the packet is successfully added (i.e., it is not a duplicate); otherwise return false.
+int[] forwardPacket(): Forwards the next packet in FIFO (First In First Out) order.
+
+Remove the packet from storage.
+Return the packet as an array [source, destination, timestamp].
+If there are no packets to forward, return an empty array.
+int getCount(int destination, int startTime, int endTime):
+
+Returns the number of packets currently stored in the router (i.e., not yet forwarded) that have the specified destination and have timestamps in the inclusive range [startTime, endTime].
+Note that queries for addPacket will be made in increasing order of timestamp.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+struct Packet {
+    int s, d, t;
+};
+
+struct TripleHash {
+    size_t operator()(const tuple<int,int,int>& x) const {
+        auto [a, b, c] = x;
+        return ((size_t)a * 1315423911u) ^ ((size_t)b << 21) ^ ((size_t)c);
+    }
+};
+
+class Router {
+    queue<Packet> q;
+    unordered_set<tuple<int,int,int>, TripleHash> st;
+    unordered_map<int, vector<int>> mp; 
+    int maxSize;
+
+public:
+    Router(int memoryLimit) {
+        maxSize = memoryLimit;
+    }
+    
+    bool addPacket(int source, int destination, int timestamp) {
+        auto key = make_tuple(source, destination, timestamp);
+
+        if (st.find(key) != st.end()) return false;
+
+        if (q.size() == maxSize) {
+            Packet p = q.front(); q.pop();
+            auto oldKey = make_tuple(p.s, p.d, p.t);
+            st.erase(oldKey);
+
+            auto &vec = mp[p.d];
+            auto it = lower_bound(vec.begin(), vec.end(), p.t);
+            if (it != vec.end() && *it == p.t) vec.erase(it);
+        }
+
+        st.insert(key);
+        mp[destination].push_back(timestamp); 
+        q.push({source, destination, timestamp});
+        return true;
+    }
+    
+    vector<int> forwardPacket() {
+        if (q.empty()) return {};
+        Packet p = q.front(); q.pop();
+        auto key = make_tuple(p.s, p.d, p.t);
+        st.erase(key);
+
+        auto &vec = mp[p.d];
+        auto it = lower_bound(vec.begin(), vec.end(), p.t);
+        if (it != vec.end() && *it == p.t) vec.erase(it);
+
+        return {p.s, p.d, p.t};
+    }
+    
+    int getCount(int destination, int startTime, int endTime) {
+        auto &vec = mp[destination];
+        auto it1 = lower_bound(vec.begin(), vec.end(), startTime);
+        auto it2 = upper_bound(vec.begin(), vec.end(), endTime);
+        return distance(it1, it2);   
+    }
+};
