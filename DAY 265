@@ -1,0 +1,30 @@
+3005. Count Elements With Maximum Frequency
+
+  
+You are given an array nums consisting of positive integers.
+
+Return the total frequencies of elements in nums such that those elements all have the maximum frequency.
+
+The frequency of an element is the number of occurrences of that element in the array.
+
+
+
+
+
+
+
+
+  class Solution {
+public:
+    int maxFrequencyElements(vector<int>& nums) {
+        short freq[101]{},max_val=-1,res;
+        for(int&val:nums)
+            freq[val]++;
+        for(short&val:freq)
+            max_val=max(max_val,val);
+        for(short&val:freq)
+            if(val==max_val) 
+                res+=max_val;
+        return res;
+    }
+};
