@@ -1,0 +1,51 @@
+1518. Water Bottles
+
+
+There are numBottles water bottles that are initially full of water. You can exchange numExchange empty water bottles from the market with one full water bottle.
+
+The operation of drinking a full water bottle turns it into an empty bottle.
+
+Given the two integers numBottles and numExchange, return the maximum number of water bottles you can drink.
+
+
+
+
+
+
+
+
+class Solution {
+public:
+    int numWaterBottles(int n, int k) {
+        return n+(n-1)/(k-1);
+    }
+};
+
+
+
+
+
+class Solution {
+public:
+    static int numWaterBottles(int n, int k, int i=0) {
+        return (n<k?0:n/k+numWaterBottles(n/k+n%k, k, i+1))+(i==0?n:0);
+    }
+};
+
+
+
+
+
+
+
+class Solution {
+public:
+    static int exchange(int n, int k){
+        if (n<k) return 0;
+        auto [n0, r]=div(n, k);
+        return n0+exchange(n0+r, k);
+    }
+    static int numWaterBottles(int n, int k) {
+        return n+exchange(n, k);
+    }
+};
