@@ -1,0 +1,39 @@
+2300. Successful Pairs of Spells and Potions
+
+
+You are given two positive integer arrays spells and potions, of length n and m respectively, where spells[i] represents the strength of the ith spell and potions[j] represents the strength of the jth potion.
+
+You are also given an integer success. A spell and potion pair is considered successful if the product of their strengths is at least success.
+
+Return an integer array pairs of length n where pairs[i] is the number of potions that will form a successful pair with the ith spell.
+
+
+
+
+
+
+
+class Solution {
+public:
+    vector<int> successfulPairs(vector<int>& spells, vector<int>& potions, long long success) {
+        int maxPotion = *max_element(potions.begin(), potions.end());
+        vector<int> freq(maxPotion + 2, 0);
+
+        for(int p : potions) freq[p]++;
+
+        for(int i = maxPotion - 1; i >= 0; i--) {
+            freq[i] += freq[i + 1];
+        }
+
+        vector<int> ans;
+        ans.reserve(spells.size());
+
+        for (int s : spells) {
+            long long need = (success + s - 1) / s;
+            if (need > maxPotion) ans.push_back(0);
+            else ans.push_back(freq[need]);
+        }
+
+        return ans;
+    }
+};
