@@ -1,0 +1,46 @@
+3354. Make Array Elements Equal to Zero
+
+
+You are given an integer array nums.
+
+Start by selecting a starting position curr such that nums[curr] == 0, and choose a movement direction of either left or right.
+
+After that, you repeat the following process:
+
+If curr is out of the range [0, n - 1], this process ends.
+If nums[curr] == 0, move in the current direction by incrementing curr if you are moving right, or decrementing curr if you are moving left.
+Else if nums[curr] > 0:
+Decrement nums[curr] by 1.
+Reverse your movement direction (left becomes right and vice versa).
+Take a step in your new direction.
+A selection of the initial position curr and movement direction is considered valid if every element in nums becomes 0 by the end of the process.
+
+Return the number of possible valid selections.
+
+
+
+
+
+
+
+
+
+
+class Solution {
+public:
+    static int countValidSelections(vector<int>& nums) {
+        const int n=nums.size();
+        vector<int> zIdx;
+        if (nums[0]==0) zIdx.push_back(0);
+        for(int i=1; i<n; i++){
+            if(nums[i]==0) zIdx.push_back(i);
+            nums[i]+=nums[i-1];
+        }
+        int cnt=0, sum=nums[n-1];
+        for (int z: zIdx){
+            if (2*nums[z]==sum) cnt+=2;
+            if (abs(2*nums[z]-sum)==1) cnt++;
+        }
+        return cnt;
+    }
+};
