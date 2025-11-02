@@ -1,0 +1,78 @@
+2257. Count Unguarded Cells in the Grid
+
+  
+You are given two integers m and n representing a 0-indexed m x n grid. You are also given two 2D integer arrays guards and walls where guards[i] = [rowi, coli] and walls[j] = [rowj, colj] represent the positions of the ith guard and jth wall respectively.
+
+A guard can see every cell in the four cardinal directions (north, east, south, or west) starting from their position unless obstructed by a wall or another guard. A cell is guarded if there is at least one guard that can see it.
+
+Return the number of unoccupied cells that are not guarded.
+
+
+
+
+
+
+
+#define idx(x, y) ((x) * n + (y))
+
+class Solution {
+public:
+    int countUnguarded(int m, int n, vector<vector<int>>& guards, vector<vector<int>>& walls) {
+        bool* stopMap = new bool[m * n]();
+        bool* visited = new bool[m * n]();
+
+        for (auto &wall : walls) {
+            stopMap[idx(wall[0], wall[1])] = true;
+        }
+
+        for (auto &guard : guards) {
+            stopMap[idx(guard[0], guard[1])] = true;
+            visited[idx(guard[0], guard[1])] = true;
+        }
+
+        int guardedCount = guards.size();
+
+        for (auto &guard : guards) {
+            int X = guard[0], Y = guard[1];
+
+            for (int x = X - 1; x >= 0; --x) {
+                if (stopMap[idx(x, Y)]) break;
+                if (!visited[idx(x, Y)]) {
+                    visited[idx(x, Y)] = true;
+                    guardedCount++;
+                }
+            }
+
+            for (int x = X + 1; x < m; ++x) {
+                if (stopMap[idx(x, Y)]) break;
+                if (!visited[idx(x, Y)]) {
+                    visited[idx(x, Y)] = true;
+                    guardedCount++;
+                }
+            }
+
+            for (int y = Y + 1; y < n; ++y) {
+                if (stopMap[idx(X, y)]) break;
+                if (!visited[idx(X, y)]) {
+                    visited[idx(X, y)] = true;
+                    guardedCount++;
+                }
+            }
+
+            for (int y = Y - 1; y >= 0; --y) {
+                if (stopMap[idx(X, y)]) break;
+                if (!visited[idx(X, y)]) {
+                    visited[idx(X, y)] = true;
+                    guardedCount++;
+                }
+            }
+        }
+
+        int result = m * n - guardedCount - (int)walls.size();
+
+        delete[] stopMap;
+        delete[] visited;
+
+        return result;
+    }
+};
