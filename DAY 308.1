@@ -1,0 +1,45 @@
+3336. Find the Number of Subsequences With Equal GCD
+
+
+You are given an integer array nums.
+
+Your task is to find the number of pairs of non-empty subsequences (seq1, seq2) of nums that satisfy the following conditions:
+
+The subsequences seq1 and seq2 are disjoint, meaning no index of nums is common between them.
+The GCD of the elements of seq1 is equal to the GCD of the elements of seq2.
+Return the total number of such pairs.
+
+Since the answer may be very large, return it modulo 109 + 7.
+
+
+
+
+
+
+
+
+class Solution {
+ public:
+  int subsequencePairCount(vector<int>& nums) {
+    const int maxNum = ranges::max(nums);
+    vector<vector<vector<int>>> mem(
+        nums.size(),
+        vector<vector<int>>(maxNum + 1, vector<int>(maxNum + 1, -1)));
+    return subsequencePairCount(nums, 0, 0, 0, mem);
+}
+ private:
+  static constexpr int kMod = 1'000'000'007;
+  int subsequencePairCount(const vector<int>& nums, int i, int x, int y,
+                           vector<vector<vector<int>>>& mem) {
+    if (i == nums.size())
+      return x > 0 && x == y;
+    if (mem[i][x][y] != -1)
+      return mem[i][x][y];
+    const int skip = subsequencePairCount(nums, i + 1, x, y, mem);
+    const int take1 =
+        subsequencePairCount(nums, i + 1, gcd(x, nums[i]), y, mem);
+    const int take2 =
+        subsequencePairCount(nums, i + 1, x, gcd(y, nums[i]), mem);
+    return mem[i][x][y] = (static_cast<long>(skip) + take1 + take2) % kMod;
+  }
+};
