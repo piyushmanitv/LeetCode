@@ -1,0 +1,94 @@
+2528. Maximize the Minimum Powered City
+Hard
+
+Topics
+premium lock icon
+Companies
+
+Hint
+You are given a 0-indexed integer array stations of length n, where stations[i] represents the number of power stations in the ith city.
+
+Each power station can provide power to every city in a fixed range. In other words, if the range is denoted by r, then a power station at city i can provide power to all cities j such that |i - j| <= r and 0 <= i, j <= n - 1.
+
+Note that |x| denotes absolute value. For example, |7 - 5| = 2 and |3 - 10| = 7.
+The power of a city is the total number of power stations it is being provided power from.
+
+The government has sanctioned building k more power stations, each of which can be built in any city, and have the same range as the pre-existing ones.
+
+Given the two integers r and k, return the maximum possible minimum power of a city, if the additional power stations are built optimally.
+
+Note that you can build the k power stations in multiple cities.
+
+
+
+
+
+
+
+
+
+
+
+class Solution {
+public:
+    vector<long long> diffArray;    // For efficient range updates
+    vector<long long> cityPower;    // Current power in each city
+    int n;
+
+    // Check if we can make every city's power at least `target`
+    bool canAchieve(long long target, int r, long long kAvailable) {
+        fill(diffArray.begin(), diffArray.end(), 0);
+        long long runningAdd = 0;
+
+        for (int i = 0; i < n; i++) {
+            runningAdd += diffArray[i];
+            long long currentPower = cityPower[i] + runningAdd;
+
+            if (currentPower < target) {
+                long long need = target - currentPower;
+                kAvailable -= need;
+                if (kAvailable < 0) return false;
+
+                runningAdd += need;
+                if (i + 2 * r + 1 < n)
+                    diffArray[i + 2 * r + 1] -= need;
+            }
+        }
+        return true;
+    }
+
+    long long maxPower(vector<int>& stations, int r, int k) {
+        n = stations.size();
+        cityPower.assign(n, 0);
+        diffArray.assign(n, 0);
+
+        // Step 1: Compute total initial power per city (range effect)
+        vector<long long> prefix(n + 1, 0);
+        for (int i = 0; i < n; i++)
+            prefix[i + 1] = prefix[i] + stations[i];
+
+        for (int i = 0; i < n; i++) {
+            int left = max(0, i - r);
+            int right = min(n - 1, i + r);
+            cityPower[i] = prefix[right + 1] - prefix[left];
+        }
+
+        // Step 2: Binary search for the maximum possible minimum power
+        long long low = *min_element(cityPower.begin(), cityPower.end());
+        long long high = *max_element(cityPower.begin(), cityPower.end()) + k;
+        long long best = 0;
+
+        while (low <= high) {
+            long long mid = low + (high - low) / 2;
+
+            if (canAchieve(mid, r, k)) {
+                best = mid;
+                low = mid + 1;
+            } else {
+                high = mid - 1;
+            }
+        }
+
+        return best;
+    }
+};
