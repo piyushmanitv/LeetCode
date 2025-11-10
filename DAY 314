@@ -1,0 +1,37 @@
+3542. Minimum Operations to Convert All Elements to Zero
+
+
+You are given an array nums of size n, consisting of non-negative integers. Your task is to apply some (possibly zero) operations on the array so that all elements become 0.
+
+In one operation, you can select a subarray [i, j] (where 0 <= i <= j < n) and set all occurrences of the minimum non-negative integer in that subarray to 0.
+
+Return the minimum number of operations required to make all elements in the array 0.
+
+
+
+
+
+
+
+
+
+
+
+
+constexpr int N=1e5;
+int st[N], top=-1;
+class Solution {
+public:
+    static int minOperations(vector<int>& nums) {
+        top=-1;
+        int op=0;
+        for (int x : nums){
+            while(top!=-1 && x<st[top]) top--;
+            if (top==-1 || x>st[top]){
+                if (x>0) op++;
+                st[++top]=x;
+            }
+        }
+        return op;
+    }
+};
