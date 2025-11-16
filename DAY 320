@@ -1,0 +1,30 @@
+1513. Number of Substrings With Only 1s
+
+Given a binary string s, return the number of substrings with all characters 1's. Since the answer may be too large, return it modulo 109 + 7.
+
+
+
+
+
+
+
+class Solution {
+public:
+    static const int M = 1000000007;
+
+    int numSub(string s) {
+        long long ans = 0;
+        long long count1 = 0;
+
+        for (char ch : s) {
+            if (ch == '1') {
+                count1++;
+                ans = (ans + count1) % M;
+            } else {
+                count1 = 0;
+            }
+        }
+
+        return (int)ans;
+    }
+};
