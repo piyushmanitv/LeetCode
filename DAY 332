@@ -1,0 +1,59 @@
+2872. Maximum Number of K-Divisible Components
+
+There is an undirected tree with n nodes labeled from 0 to n - 1. You are given the integer n and a 2D integer array edges of length n - 1, where edges[i] = [ai, bi] indicates that there is an edge between nodes ai and bi in the tree.
+
+You are also given a 0-indexed integer array values of length n, where values[i] is the value associated with the ith node, and an integer k.
+
+A valid split of the tree is obtained by removing any set of edges, possibly empty, from the tree such that the resulting components all have values that are divisible by k, where the value of a connected component is the sum of the values of its nodes.
+
+Return the maximum number of components in any valid split.
+
+
+
+
+
+
+
+
+
+
+
+
+
+class Solution {
+public:
+    int maxKDivisibleComponents(int n, vector<vector<int>>& edges, vector<int>& values, int k) {
+        if (n==1) return 1;
+        vector<int> adj(n), idg(n);
+
+        for (auto& e : edges) {
+            adj[e[0]] ^= e[1];
+            adj[e[1]] ^= e[0];
+            idg[e[0]]++; idg[e[1]]++;
+        }
+
+        queue<int> q;
+
+        for (int i = 0; i <n; i++){
+            if (idg[i] == 1) q.emplace(i);
+        }
+
+        int res = 0;
+        while(!q.empty()) {
+            int size = q.size();
+
+            for (int i = 0; i<size; i++) {
+                int cur = q.front(); q.pop();
+                int nei = adj[cur];
+                adj[nei] ^= cur;
+                if (--idg[nei] == 1) q.emplace(nei);
+
+                values[cur] %= k;
+                if (!values[cur]) res++;
+                values[nei] += values[cur];
+            }
+        }
+
+        return res;
+    }
+};
