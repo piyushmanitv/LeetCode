@@ -1,0 +1,43 @@
+3573. Best Time to Buy and Sell Stock V
+
+You are given an integer array prices where prices[i] is the price of a stock in dollars on the ith day, and an integer k.
+
+You are allowed to make at most k transactions, where each transaction can be either of the following:
+
+Normal transaction: Buy on day i, then sell on a later day j where i < j. You profit prices[j] - prices[i].
+
+Short selling transaction: Sell on day i, then buy back on a later day j where i < j. You profit prices[i] - prices[j].
+
+Note that you must complete each transaction before starting another. Additionally, you can't buy or sell on the same day you are selling or buying back as part of a previous transaction.
+
+Return the maximum total profit you can earn by making at most k transactions.
+
+
+
+
+
+
+
+
+
+
+
+
+
+class Solution {
+public:
+    long long maximumProfit(vector<int>& prices, int k) {
+        vector<long long> dp(k + 1 , 0), buy(k , -1e9), sell(k , 0);
+        for(int i = 0, n = prices.size(); i < n; ++i){
+            int price = prices[i];
+            for(int j = k; j; --j){
+                dp[j] = max(dp[j] , max(buy[j - 1] + price , sell[j - 1] - price));
+                buy[j - 1] = max(buy[j - 1] , dp[j - 1] - price);
+                sell[j - 1] = max(sell[j - 1] , dp[j - 1] + price);
+            }
+        }
+        long long res = 0;
+        for(int i = 0; i <= k; ++i) res = max(res , dp[i]);
+        return res;
+    }
+};
