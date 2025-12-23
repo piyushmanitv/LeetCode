@@ -1,0 +1,51 @@
+2054. Two Best Non-Overlapping Events
+
+You are given a 0-indexed 2D integer array of events where events[i] = [startTimei, endTimei, valuei]. The ith event starts at startTimei and ends at endTimei, and if you attend this event, you will receive a value of valuei. You can choose at most two non-overlapping events to attend such that the sum of their values is maximized.
+
+Return this maximum sum.
+
+Note that the start time and end time is inclusive: that is, you cannot attend two events where one of them starts and the other ends at the same time. More specifically, if you attend an event with end time t, the next event must start at or after t + 1.
+
+
+
+
+
+
+
+
+
+
+struct Data {
+    int startTime;
+    pair<int, int> p;
+
+    Data(int s, int e, int v) : startTime(s), p(e, v){
+
+    }
+    bool operator<(const Data& oth) const {
+        return startTime < oth.startTime;
+    }
+};
+class Solution {
+public:
+    int maxTwoEvents(const vector<vector<int>>& events) {
+        vector<Data> v;
+        v.reserve(events.size());
+        for (const auto& e : events){
+            v.emplace_back(e[0], e[1], e[2]);
+        }
+        sort(v.begin(), v.end());
+
+        int prevMax = 0, ret = 0;
+        priority_queue<pair<int, int>, vector<pair<int, int>>, greater<>> pq;
+        for (const auto& d : v){
+            while (!pq.empty() && pq.top().first < d.startTime){
+                prevMax = max(prevMax, pq.top().second);
+                pq.pop();
+            }
+            ret = max(ret, prevMax + d.p.second);
+            pq.emplace(d.p);
+        }
+        return ret;
+    }
+};
