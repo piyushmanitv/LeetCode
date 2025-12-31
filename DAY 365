@@ -1,0 +1,113 @@
+1970. Last Day Where You Can Still Cross
+
+There is a 1-based binary matrix where 0 represents land and 1 represents water. You are given integers row and col representing the number of rows and columns in the matrix, respectively.
+
+Initially on day 0, the entire matrix is land. However, each day a new cell becomes flooded with water. You are given a 1-based 2D array cells, where cells[i] = [ri, ci] represents that on the ith day, the cell on the rith row and cith column (1-based coordinates) will be covered with water (i.e., changed to 1).
+
+You want to find the last day that it is possible to walk from the top to the bottom by only walking on land cells. You can start from any cell in the top row and end at any cell in the bottom row. You can only travel in the four cardinal directions (left, right, up, and down).
+
+Return the last day where it is possible to walk from the top to the bottom by only walking on land cells.
+
+ 
+
+
+
+
+
+
+
+struct DSU {
+    int size, n, m;
+    vector<int> arr, sz;
+    vector<bool> first, last;
+
+    DSU(int _n, int _m) {
+        n = _n, m = _m;
+        size = n * m;
+        arr.resize(size);
+        sz.resize(size);
+        first.resize(size, false);
+        last.resize(size, false);
+        for(int i = 0; i < size; i++) {
+            arr[i] = i;
+            sz[i] = 1;
+        }
+    }
+
+    int getNode(int i, int j) {
+        return i * m + j;
+    }
+
+    void add(int i, int j) {
+        int node = getNode(i, j);
+        if(j == 0) first[node] = true;
+        if(j == m - 1) last[node] = true;
+    }
+
+    int find(int node) {
+        while(node != arr[node]) {
+            arr[node] = arr[arr[node]];
+            node = arr[node];
+        }
+        return node;
+    }
+
+    void unite(int i1, int j1, int i2, int j2) {
+        int node1 = getNode(i1, j1), node2 = getNode(i2, j2);
+        int root1 = find(node1), root2 = find(node2);
+        if(root1 == root2) {
+            return ;
+        }
+        if(sz[root1] > sz[root2]) {
+            swap(root1, root2);
+        }
+        arr[root1] = root2;
+        sz[root2] += sz[root1];
+        first[root2] = first[root2] || first[root1];
+        last[root2] = last[root2] || last[root1];
+    }
+
+    bool canCross(int i, int j) {
+        int node = getNode(i, j);
+        int root = find(node);
+        if(first[root] && last[root]) {
+            return false;
+        }
+        return true;
+    }
+};
+
+
+
+class Solution {
+public:
+
+    vector<int> dx = {0, 1, 0, -1, 1, 1, -1, -1};
+    vector<int> dy = {1, 0, -1, 0, 1, -1, 1, -1};
+
+    bool isValid(int i, int j, int row, int col) {
+        return i >= 0 && i < row && j >= 0 && j < col;
+    }
+
+    int latestDayToCross(int row, int col, vector<vector<int>>& cells) {
+        DSU dsu(row, col);
+        vector<vector<int>> grid(row, vector<int> (col, 0));
+        int c = 0;
+        for(int i = 0; i < cells.size(); i++) {
+            int c1 = cells[i][0] - 1, c2 = cells[i][1] - 1;
+            grid[c1][c2] = 1;
+            dsu.add(c1, c2);
+            for(int j = 0; j < 8; j++) {
+                int x = c1 + dx[j], y = c2 + dy[j];
+                if(isValid(x, y, row, col) && grid[x][y]) {
+                    dsu.unite(c1, c2, x, y);
+                }
+            }
+            if(!dsu.canCross(c1, c2)) {
+                break;
+            }
+            c = i + 1;
+        }
+        return c;
+    }
+};
