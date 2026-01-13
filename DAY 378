@@ -1,0 +1,52 @@
+3453. Separate Squares I
+
+You are given a 2D integer array squares. Each squares[i] = [xi, yi, li] represents the coordinates of the bottom-left point and the side length of a square parallel to the x-axis.
+
+Find the minimum y-coordinate value of a horizontal line such that the total area of the squares above the line equals the total area of the squares below the line.
+
+Answers within 10-5 of the actual answer will be accepted.
+
+Note: Squares may overlap. Overlapping areas should be counted multiple times.
+
+
+
+
+
+
+
+class Solution {
+    double delta = 1e-6;
+public:
+    double separateSquares(vector<vector<int>>& squares) {
+        int n = squares.size();
+        if(!n)
+            return 0;
+        double y_max = INT_MIN, y_min = INT_MAX;
+        for(const auto&cur:squares){
+            double y0 = cur[1], y1 = cur[1]+cur[1];
+            y_max = max(y_max, y1*1.0);
+            y_min = min(y_min, y0*1.0);
+        }
+        double l = y_min, r = y_max;
+        while(r-l>delta){
+            double mid = l+(r-l)/2;
+            if(validate(squares, mid))
+                r = mid;
+            else
+                l = mid;
+        }
+        return l;
+
+    }
+
+    bool validate(const vector<vector<int>>&squares, double y){
+        double left = 0, right = 0;
+        for(const auto&s:squares){
+            double x0 = s[0], y0 = s[1], l = s[2];
+            double x1 = x0+l, y1 = y0+l;
+            left += max(0.0, l*(min(y1, y)-y0));
+            right += max(0.0, l*(y1-max(y, y0)));
+        }
+        return left>=right;
+    }
+};
