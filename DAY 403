@@ -1,0 +1,50 @@
+3651. Minimum Cost Path with Teleportations
+
+You are given a m x n 2D integer array grid and an integer k. You start at the top-left cell (0, 0) and your goal is to reach the bottom‐right cell (m - 1, n - 1).
+
+There are two types of moves available:
+
+Normal move: You can move right or down from your current cell (i, j), i.e. you can move to (i, j + 1) (right) or (i + 1, j) (down). The cost is the value of the destination cell.
+
+Teleportation: You can teleport from any cell (i, j), to any cell (x, y) such that grid[x][y] <= grid[i][j]; the cost of this move is 0. You may teleport at most k times.
+
+Return the minimum total cost to reach cell (m - 1, n - 1) from (0, 0).
+
+
+
+
+
+
+
+class Solution {
+public:
+    int minCost(vector<vector<int>>& grid, int k) {
+        int m = grid.size(), n = grid[0].size(), mx = 0;
+        for(int i=0;i<m;i++){
+            for(int j=0;j<n;j++){
+                mx = max(mx, grid[i][j]);
+            }
+        }
+        vector<int> suff(mx+2, INT_MAX);
+        vector<vector<int>> dp(m+1, vector<int>(n+1, INT_MAX/2));
+        //base case
+        dp[1][1] = 0;
+        //dp
+        for(int s=0;s<=k;s++){
+            vector<int> minF(mx+2, INT_MAX);
+            for(int i=0;i<m;i++){
+                for(int j=0;j<n;j++){
+                    int x = grid[i][j];
+                    if(i==0 && j==0){
+                        minF[x] = 0;
+                        continue;
+                    }
+                    dp[i+1][j+1] = min(min(dp[i][j+1], dp[i+1][j]) + x, suff[x]);
+                    minF[x] = min(minF[x], dp[i+1][j+1]);
+                }
+            }
+            for(int t=mx;t>=0;t--)suff[t] = min(suff[t+1], minF[t]);
+        }
+        return dp[m][n];
+    }
+};
