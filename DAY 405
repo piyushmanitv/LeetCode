@@ -1,0 +1,154 @@
+2977. Minimum Cost to Convert String II
+
+You are given two 0-indexed strings source and target, both of length n and consisting of lowercase English characters. You are also given two 0-indexed string arrays original and changed, and an integer array cost, where cost[i] represents the cost of converting the string original[i] to the string changed[i].
+
+You start with the string source. In one operation, you can pick a substring x from the string, and change it to y at a cost of z if there exists any index j such that cost[j] == z, original[j] == x, and changed[j] == y. You are allowed to do any number of operations, but any pair of operations must satisfy either of these two conditions:
+
+The substrings picked in the operations are source[a..b] and source[c..d] with either b < c or d < a. In other words, the indices picked in both operations are disjoint.
+The substrings picked in the operations are source[a..b] and source[c..d] with a == c and b == d. In other words, the indices picked in both operations are identical.
+Return the minimum cost to convert the string source to the string target using any number of operations. If it is impossible to convert source to target, return -1.
+
+Note that there may exist indices i, j such that original[j] == original[i] and changed[j] == changed[i].
+
+
+
+
+
+
+
+
+
+class Solution {
+public:
+    const int mod = 1e9 + 7;
+    const int p = 31;
+    const long long INF = 1e14; 
+
+    long long mult(long long a, long long b) {
+        return (a * b) % mod;
+    }
+
+    long long power(long long x, long long y) {
+        long long res = 1;
+        x %= mod;
+        while (y > 0) {
+            if (y & 1) res = mult(res, x);
+            y >>= 1;
+            x = mult(x, x);
+        }
+        return res;
+    }
+
+    long long modInverse(long long n) {
+        return power(n, mod - 2);
+    }
+    void init(const string& s, vector<long long>& h, vector<long long>& inv) {
+        int n = s.size();
+        h.resize(n);
+        inv.resize(n);
+        
+        long long pPow = 1;
+        long long invP = modInverse(p); 
+        long long currInv = 1;
+
+        for(int i = 0; i < n; i++) {
+            long long term = ((s[i] - 'a' + 1) * pPow) % mod;
+            if(i == 0) h[i] = term;
+            else h[i] = (h[i - 1] + term) % mod;
+            
+            inv[i] = currInv;
+            
+            pPow = mult(pPow, p);
+            currInv = mult(currInv, invP);
+        }
+    }
+
+    long long getHash(int l, int r, const vector<long long>& h, const vector<long long>& inv) {
+        if (l > r) return 0;
+        long long rawVal = h[r];
+        if (l > 0) rawVal = (rawVal - h[l - 1] + mod) % mod;
+        return mult(rawVal, inv[l]);
+    }
+
+    long long minimumCost(string source, string target, vector<string>& original, vector<string>& changed, vector<int>& cost) {
+        unordered_map<long long, int> dict;
+        int unique = 1;
+        
+        unordered_set<int> sizes;
+        
+        int n_orig = original.size();
+        int MAX_NODES = 2 * n_orig + 5;
+        vector<vector<long long>> graph(MAX_NODES, vector<long long>(MAX_NODES, INF));
+        for(int i = 0; i < MAX_NODES; i++) graph[i][i] = 0;
+
+        auto computeStringHash = [&](const string& s) -> long long {
+            long long h = 0;
+            long long pp = 1;
+            for(char c : s) {
+                h = (h + (c - 'a' + 1) * pp) % mod;
+                pp = mult(pp, p);
+            }
+            return h;
+        };
+
+        for(int i = 0; i < n_orig; i++) {
+            sizes.insert(original[i].size());
+            
+            long long h1 = computeStringHash(original[i]);
+            long long h2 = computeStringHash(changed[i]);
+            
+            if(!dict.count(h1)) dict[h1] = unique++;
+            if(!dict.count(h2)) dict[h2] = unique++;
+            
+            int u = dict[h1];
+            int v = dict[h2];
+            graph[u][v] = min(graph[u][v], (long long)cost[i]);
+        }
+
+        for(int k = 1; k < unique; k++) {
+            for(int i = 1; i < unique; i++) {
+                if(graph[i][k] == INF) continue;
+                for(int j = 1; j < unique; j++) {
+                    if(graph[k][j] < INF) {
+                        graph[i][j] = min(graph[i][j], graph[i][k] + graph[k][j]);
+                    }
+                }
+            }
+        }
+
+        int n = source.size();
+        vector<long long> sHash, sInv;
+        vector<long long> tHash, tInv;
+        
+        init(source, sHash, sInv);
+        init(target, tHash, tInv);
+
+        vector<long long> dp(n + 1, INF);
+        dp[n] = 0;
+
+        for(int i = n - 1; i >= 0; i--) {
+            if(source[i] == target[i]) {
+                dp[i] = dp[i + 1];
+            }
+            
+            for(int len : sizes) {
+                if(i + len > n) continue;
+                
+                int j = i + len - 1;
+                long long curS = getHash(i, j, sHash, sInv);
+                long long curT = getHash(i, j, tHash, tInv);
+
+                if(dict.count(curS) && dict.count(curT)) {
+                    int u = dict[curS];
+                    int v = dict[curT];
+                    if(graph[u][v] < INF) {
+                        dp[i] = min(dp[i], dp[i + len] + graph[u][v]);
+                    }
+                }
+            }
+        }
+
+        if(dp[0] >= INF) return -1;
+        return dp[0];
+    }
+};
