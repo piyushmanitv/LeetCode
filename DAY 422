@@ -1,0 +1,25 @@
+
+190. Reverse Bits
+Easy
+Topics
+premium lock icon
+Companies
+Reverse bits of a given 32 bits signed integer
+
+
+
+
+
+
+
+class Solution {
+public:
+        int reverseBits(int n) {
+    if (n==0) return 0;
+    int ans=0;
+    for(; n; n&=(n-1)){
+        ans+=1<<(31-__builtin_ctz(n));
+    }
+    return ans;
+    }
+};
