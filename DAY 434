@@ -1,0 +1,26 @@
+1680. Concatenation of Consecutive Binary Numbers
+Medium
+Topics
+premium lock icon
+Companies
+Hint
+Given an integer n, return the decimal value of the binary string formed by concatenating the binary representations of 1 to n in order, modulo 109 + 7.
+
+
+
+
+
+
+class Solution {
+public:
+    static int concatenatedBinary(int n) {
+        constexpr int mod=1e9+7;
+        uint64_t ans=0;
+        for(unsigned x=1; x<=n; x++){
+            const int bw=32-countl_zero(x);
+            ans=(ans<<bw)+x;
+            if (ans>=mod) ans%=mod;
+        }
+        return ans;
+    }
+};
