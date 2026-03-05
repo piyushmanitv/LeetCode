@@ -1,0 +1,32 @@
+Longest Substring with K Uniques
+Difficulty: MediumAccuracy: 34.65%Submissions: 271K+Points: 4
+You are given a string s consisting only lowercase alphabets and an integer k. Your task is to find the length of the longest substring that contains exactly k distinct characters.
+
+Note : If no such substring exists, return -1. 
+
+
+
+
+
+
+
+class Solution {
+  public:
+    int longestKSubstr(string &arr, int k) {
+        int ans = -1;
+        int n = arr.size();
+        map<int,int>mp;
+        int i=0,j=0;
+        while(j < n){
+            mp[arr[j]]++;
+            while(mp.size() > k){
+                mp[arr[i]]--;
+                if(mp[arr[i]] == 0)mp.erase(arr[i]);
+                i++;
+            }
+            if(mp.size() == k)ans = max(ans,j-i+1);
+            j++;
+        }
+        return ans;
+    }
+};
