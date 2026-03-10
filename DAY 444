@@ -1,0 +1,71 @@
+3130. Find All Possible Stable Binary Arrays II
+
+You are given 3 positive integers zero, one, and limit.
+
+A binary array arr is called stable if:
+
+The number of occurrences of 0 in arr is exactly zero.
+The number of occurrences of 1 in arr is exactly one.
+Each subarray of arr with a size greater than limit must contain both 0 and 1.
+Return the total number of stable binary arrays.
+
+Since the answer may be very large, return it modulo 109 + 7.
+
+
+
+
+
+
+
+
+
+
+
+
+
+#pragma GCC optimize("Ofast,unroll-loops")
+#pragma GCC target("avx2,bmi,bmi2")
+#include <vector>
+
+using namespace std;
+
+static const int fast_io = []() {
+    ios_base::sync_with_stdio(0); cin.tie(0); return 0;
+}();
+
+int dp[1001][1001][2];
+
+class Solution {
+    const int MOD = 1e9 + 7;
+public:
+    int numberOfStableArrays(int zero, int one, int limit) {
+        for (int i = 0; i <= zero; ++i) {
+            for (int j = 0; j <= one; ++j) {
+                dp[i][j][0] = dp[i][j][1] = 0;
+            }
+        }
+        for (int i = 1; i <= min(zero, limit); ++i) dp[i][0][0] = 1;
+        for (int j = 1; j <= min(one, limit); ++j) dp[0][j][1] = 1;
+
+        for (int i = 1; i <= zero; ++i) {
+            for (int j = 1; j <= one; ++j) {
+                long long val0 = (long long)dp[i - 1][j][0] + dp[i - 1][j][1];
+                if (i > limit) {
+                    val0 -= dp[i - limit - 1][j][1];
+                    if (val0 < 0) val0 += MOD;
+                }
+                dp[i][j][0] = val0 % MOD;
+
+                long long val1 = (long long)dp[i][j - 1][0] + dp[i][j - 1][1];
+                if (j > limit) {
+                    val1 -= dp[i][j - limit - 1][0];
+                    if (val1 < 0) val1 += MOD;
+                }
+                dp[i][j][1] = val1 % MOD;
+            }
+        }
+
+        int res = (dp[zero][one][0] + dp[zero][one][1]) % MOD;
+        return res;
+    }
+};
