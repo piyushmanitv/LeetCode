@@ -1,0 +1,39 @@
+3070. Count Submatrices with Top-Left Element and Sum Less Than k
+
+You are given a 0-indexed integer matrix grid and an integer k.
+
+Return the number of submatrices that contain the top-left element of the grid, and have a sum less than or equal to k.
+
+
+
+
+
+
+
+
+class Solution {
+public:
+    int countSubmatrices(vector<vector<int>>& grid, int k) {
+        int m = grid.size(), n = grid[0].size();
+        int row = 0, col = 0;
+        for (int sum = 0; row < m; ++row) {
+            sum += grid[row][0];
+            if (sum > k) break;
+            grid[row][0] = sum;
+        }
+        for (int sum = 0; col < n; ++col) {
+            sum += grid[0][col];
+            if (sum > k) break;
+            grid[0][col] = sum;
+        }
+        if (!row && !col) return 0;
+        int res = row + col - 1;
+        for (int i = 1; i < row; ++i) {
+            for (int j = 1; j < col; ++j) {
+                grid[i][j] += grid[i - 1][j] + grid[i][j - 1] - grid[i - 1][j - 1];
+                if (grid[i][j] <= k) ++res;
+            }
+        }
+        return res;
+    }
+};
