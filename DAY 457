@@ -1,0 +1,59 @@
+1594. Maximum Non Negative Product in a Matrix
+Medium
+Topics
+premium lock icon
+Companies
+Hint
+You are given a m x n matrix grid. Initially, you are located at the top-left corner (0, 0), and in each step, you can only move right or down in the matrix.
+
+Among all possible paths starting from the top-left corner (0, 0) and ending in the bottom-right corner (m - 1, n - 1), find the path with the maximum non-negative product. The product of a path is the product of all integers in the grid cells visited along the path.
+
+Return the maximum non-negative product modulo 109 + 7. If the maximum product is negative, return -1.
+
+Notice that the modulo is performed after getting the maximum product.
+
+
+
+
+
+
+
+
+
+class Solution {
+public:
+    int maxProductPath(vector<vector<int>>& grid) {
+        int m = grid.size(), n = grid[0].size();
+        const long long MOD = 1e9 + 7;
+
+        vector<vector<long long>> mx(m, vector<long long>(n, 0));
+        vector<vector<long long>> mn(m, vector<long long>(n, 0));
+
+        mx[0][0] = mn[0][0] = grid[0][0];
+        
+        for (int j = 1; j < n; j++) {
+            mx[0][j] = mn[0][j] = mx[0][j - 1] * grid[0][j];
+        }
+        for (int i = 1; i < m; i++) {
+            mx[i][0] = mn[i][0] = mx[i - 1][0] * grid[i][0];
+        }
+
+        for (int i = 1; i < m; i++) {
+            for (int j = 1; j < n; j++) {
+                long long x = grid[i][j];
+
+                long long a = mx[i - 1][j] * x;
+                long long b = mn[i - 1][j] * x;
+                long long c = mx[i][j - 1] * x;
+                long long d = mn[i][j - 1] * x;
+
+                mx[i][j] = max({a, b, c, d});
+                mn[i][j] = min({a, b, c, d});
+            }
+        }
+
+        long long ans = mx[m - 1][n - 1];
+        if (ans < 0) return -1;
+        return ans % MOD;
+    }
+};
