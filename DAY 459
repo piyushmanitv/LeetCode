@@ -1,0 +1,58 @@
+3546. Equal Sum Grid Partition I
+Medium
+Topics
+premium lock icon
+Companies
+Hint
+You are given an m x n matrix grid of positive integers. Your task is to determine if it is possible to make either one horizontal or one vertical cut on the grid such that:
+
+Each of the two resulting sections formed by the cut is non-empty.
+The sum of the elements in both sections is equal.
+Return true if such a partition exists; otherwise return false.
+
+
+
+
+
+
+class Solution {
+public:
+    bool canPartitionGrid(vector<vector<int>>& grid) {
+        
+        int n = grid.size();
+        int m = grid[0].size();
+
+        vector<long long> row(n,0), col(m,0);
+
+        for(int i=0;i<n;i++){
+            for(int j=0;j<m;j++){
+                row[i] += grid[i][j];
+                col[j] += grid[i][j];
+            }
+        }
+
+        long long total = 0;
+        for(auto x : row) total += x;
+
+        long long prefix = 0;
+
+        for(int i=0;i<n-1;i++){
+            prefix += row[i];
+            if(prefix == total - prefix)
+                return true;
+        }
+
+        total = 0;
+        for(auto x : col) total += x;
+
+        prefix = 0;
+
+        for(int i=0;i<m-1;i++){
+            prefix += col[i];
+            if(prefix == total - prefix)
+                return true;
+        }
+
+        return false;
+    }
+};
