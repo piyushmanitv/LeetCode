@@ -1,0 +1,72 @@
+2075. Decode the Slanted Ciphertext
+Medium
+Topics
+premium lock icon
+Companies
+Hint
+A string originalText is encoded using a slanted transposition cipher to a string encodedText with the help of a matrix having a fixed number of rows rows.
+
+originalText is placed first in a top-left to bottom-right manner.
+
+
+The blue cells are filled first, followed by the red cells, then the yellow cells, and so on, until we reach the end of originalText. The arrow indicates the order in which the cells are filled. All empty cells are filled with ' '. The number of columns is chosen such that the rightmost column will not be empty after filling in originalText.
+
+encodedText is then formed by appending all characters of the matrix in a row-wise fashion.
+
+
+The characters in the blue cells are appended first to encodedText, then the red cells, and so on, and finally the yellow cells. The arrow indicates the order in which the cells are accessed.
+
+For example, if originalText = "cipher" and rows = 3, then we encode it in the following manner:
+
+
+The blue arrows depict how originalText is placed in the matrix, and the red arrows denote the order in which encodedText is formed. In the above example, encodedText = "ch ie pr".
+
+Given the encoded string encodedText and number of rows rows, return the original string originalText.
+
+Note: originalText does not have any trailing spaces ' '. The test cases are generated such that there is only one possible originalText.
+
+
+
+
+
+
+
+
+
+
+#pragma GCC optimize("Ofast,unroll-loops,inline")
+#include <string>
+
+static const int speedup = []() {
+    std::ios_base::sync_with_stdio(false);
+    std::cin.tie(NULL);
+    return 0;
+}();
+
+class Solution {
+public:
+    std::string decodeCiphertext(std::string& encodedText, int rows) {
+        if (rows == 1) return encodedText;
+        
+        const int L = encodedText.length();
+        if (L == 0) return "";
+        
+        const int C = L / rows;
+        const char* s = encodedText.data();
+        std::string res(C, ' '); 
+        std::string out;
+        out.reserve(C); 
+        for (int j = 0; j < C; ++j) {
+            for (int r = 0; r < rows; ++r) {
+                int c = j + r;
+                if (c >= C) break;
+                out += s[r * C + c];
+            }
+        }
+        size_t last = out.find_last_not_of(' ');
+        if (last == std::string::npos) return "";
+        out.erase(last + 1);
+
+        return out;
+    }
+};
