@@ -1,0 +1,108 @@
+2069. Walking Robot Simulation II
+Medium
+Topics
+premium lock icon
+Companies
+Hint
+A width x height grid is on an XY-plane with the bottom-left cell at (0, 0) and the top-right cell at (width - 1, height - 1). The grid is aligned with the four cardinal directions ("North", "East", "South", and "West"). A robot is initially at cell (0, 0) facing direction "East".
+
+The robot can be instructed to move for a specific number of steps. For each step, it does the following.
+
+Attempts to move forward one cell in the direction it is facing.
+If the cell the robot is moving to is out of bounds, the robot instead turns 90 degrees counterclockwise and retries the step.
+After the robot finishes moving the number of steps required, it stops and awaits the next instruction.
+
+Implement the Robot class:
+
+Robot(int width, int height) Initializes the width x height grid with the robot at (0, 0) facing "East".
+void step(int num) Instructs the robot to move forward num steps.
+int[] getPos() Returns the current cell the robot is at, as an array of length 2, [x, y].
+String getDir() Returns the current direction of the robot, "North", "East", "South", or "West".
+
+
+
+
+
+
+
+
+
+
+class Robot {
+public:
+  Robot(int width, int height) : width(width), height(height) {}
+  
+  void step(int num) {
+    perimeter_index = (perimeter_index + num) % perimeter_cycle_length();
+    if (perimeter_index == ll_index() || perimeter_index > ul_index()) {
+      dir_index = south;
+    } else if (perimeter_index <= lr_index()) {
+      dir_index = east;
+    } else if (perimeter_index <= ur_index()) {
+      dir_index = north;
+    } else {
+      dir_index = west;
+    }
+  }
+  
+  vector<int> getPos() {
+    if (perimeter_index <= lr_index()) {
+      return {perimeter_index, 0};
+    } else if (perimeter_index <= ur_index()) {
+      auto offset = perimeter_index - lr_index();
+      return {width - 1, offset};
+    } else if (perimeter_index <= ul_index()) {
+      auto offset = perimeter_index - ur_index();
+      return {width - 1 - offset, height - 1};
+    } else {
+      auto offset = perimeter_index - ul_index();
+      return {0, height - 1 - offset};
+    }
+  }
+  
+  string getDir() {
+    return dirs[dir_index];
+  }
+
+private:
+  int width;
+  int height;
+  int perimeter_index = 0;
+  int dir_index = 0;
+  static constexpr inline int east = 0;
+  static constexpr inline int north = 1;
+  static constexpr inline int west = 2;
+  static constexpr inline int south = 3;
+  static constexpr inline array<string, 4> dirs = {
+      "East", "North", "West", "South"
+  };
+
+  int perimeter_cycle_length() {
+     return (width + height - 2) << 1;
+  }
+
+  int ll_index() {
+    return 0;
+  }
+
+  int lr_index() {
+    return width - 1;
+  }
+
+  int ur_index() {
+    return lr_index() + height - 1;
+  }
+
+  int ul_index() {
+    return ur_index() + width - 1;
+  }
+
+};
+
+/**
+ * Your Robot object will be instantiated and called as such:
+ * Robot* obj = new Robot(width, height);
+ * obj->step(num);
+ * vector<int> param_2 = obj->getPos();
+ * string param_3 = obj->getDir();
+ */
