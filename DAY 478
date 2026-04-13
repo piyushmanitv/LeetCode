@@ -1,0 +1,36 @@
+1848. Minimum Distance to the Target Element
+Easy
+Topics
+premium lock icon
+Companies
+Hint
+Given an integer array nums (0-indexed) and two integers target and start, find an index i such that nums[i] == target and abs(i - start) is minimized. Note that abs(x) is the absolute value of x.
+
+Return abs(i - start).
+
+It is guaranteed that target exists in nums.
+
+
+
+
+
+
+
+
+
+class Solution {
+public:
+    int getMinDistance(vector<int>& nums, int target, int start) {
+        if(nums[start] == target) return 0;
+
+        int n=nums.size();
+        int d=1;
+        while(true){
+            if(start-d>=0 && nums[start-d]==target) return d;
+            if(start+d<n && nums[start+d] == target) return d;
+
+            d++;
+        }
+        return -1;
+    }
+};
