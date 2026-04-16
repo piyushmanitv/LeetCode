@@ -1,0 +1,43 @@
+3488. Closest Equal Element Queries
+Solved
+Medium
+Topics
+premium lock icon
+Companies
+Hint
+You are given a circular array nums and an array queries.
+
+For each query i, you have to find the following:
+
+The minimum distance between the element at index queries[i] and any other index j in the circular array, where nums[j] == nums[queries[i]]. If no such index exists, the answer for that query should be -1.
+Return an array answer of the same size as queries, where answer[i] represents the result for query i.
+
+
+
+
+
+
+
+
+
+
+
+class Solution {
+public:
+    vector<int> solveQueries(vector<int>& nums, vector<int>& queries) {
+        int n = nums.size();
+        vector<int> v(n, -1), ans;
+        unordered_map<int, int> last;
+        for(int i = 0; i < 2 * n; i++) {
+            if(last.contains(nums[i % n])) {
+                int l = last[nums[i % n]], d = i - l;
+                if(d >= n) continue;
+                if(v[i % n] == -1 || v[i % n] > d) v[i % n] = d;
+                if(v[l % n] == -1 || v[l % n] > d) v[l % n] = d;
+            }
+            last[nums[i % n]] = i;
+        }
+        for(int q : queries) ans.push_back(v[q]);
+        return ans;
+    }
+};
