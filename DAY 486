@@ -1,0 +1,69 @@
+1722. Minimize Hamming Distance After Swap Operations
+Solved
+Medium
+Topics
+premium lock icon
+Companies
+Hint
+You are given two integer arrays, source and target, both of length n. You are also given an array allowedSwaps where each allowedSwaps[i] = [ai, bi] indicates that you are allowed to swap the elements at index ai and index bi (0-indexed) of array source. Note that you can swap elements at a specific pair of indices multiple times and in any order.
+
+The Hamming distance of two arrays of the same length, source and target, is the number of positions where the elements are different. Formally, it is the number of indices i for 0 <= i <= n-1 where source[i] != target[i] (0-indexed).
+
+Return the minimum Hamming distance of source and target after performing any amount of swap operations on array source.
+
+
+
+
+
+
+
+
+constexpr int N=1e5+1;
+int Rt[N], Rk[N]; 
+int freq[N];
+class UnionFind {
+public:
+    UnionFind(int n){
+        iota(Rt, Rt+n, 0);
+        fill(Rk, Rk+n, 0);
+    }
+    int Find(int x) {
+        return (x == Rt[x])?x:Rt[x]=Find(Rt[x]);
+    }
+    bool Union(int x, int y) {
+        x=Find(x), y=Find(y);
+        if (x==y) return 0;
+        if (Rk[x]>Rk[y]) swap(x, y);
+        Rt[x]=y;
+        if (Rk[x]==Rk[y]) Rk[y]++;
+        return 1;
+    }
+};
+
+class Solution {
+public:
+    static int minimumHammingDistance(vector<int>& source, vector<int>& target, vector<vector<int>>& allowedSwaps) {
+        const int n=source.size();
+        UnionFind G(n);
+        for(auto& sw : allowedSwaps)
+            G.Union(sw[0], sw[1]);
+        vector<vector<int>> components(n);
+        for(int i=0; i<n; i++)
+            components[G.Find(i)].push_back(i);
+        int match=0;
+        for(int i=0;i<n; i++) {
+            if (components[i].empty()) continue;
+            for(int idx : components[i])
+                freq[source[idx]]++;
+            for(int idx : components[i]) {
+                if (freq[target[idx]]>0) {
+                    freq[target[idx]]--;
+                    match++;
+                }
+            }
+            for(int idx : components[i]) 
+                freq[source[idx]]=0; 
+        }
+        return n-match;
+    }
+};
