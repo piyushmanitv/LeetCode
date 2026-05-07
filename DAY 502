@@ -1,0 +1,66 @@
+3660. Jump Game IX
+Medium
+Topics
+premium lock icon
+Companies
+Hint
+You are given an integer array nums.
+
+From any index i, you can jump to another index j under the following rules:
+
+Jump to index j where j > i is allowed only if nums[j] < nums[i].
+Jump to index j where j < i is allowed only if nums[j] > nums[i].
+For each index i, find the maximum value in nums that can be reached by following any sequence of valid jumps starting at i.
+
+Return an array ans where ans[i] is the maximum value reachable starting from index i.
+
+
+
+
+
+
+
+
+
+#pragma GCC optimize("Ofast,inline,unroll-loops")
+#pragma GCC target("avx2,bmi,bmi2")
+
+#include <vector>
+#include <algorithm>
+
+using namespace std;
+
+static int res_ptr[100005];
+
+static const int fast_io = []() {
+    ios_base::sync_with_stdio(false);
+    cin.tie(NULL);
+    return 0;
+}();
+
+class Solution {
+public:
+    vector<int> maxValue(vector<int>& a) {
+        const int n = a.size();
+        if (__builtin_expect(n == 0, 0)) return {};
+        
+        res_ptr[0] = a[0];
+        #pragma GCC ivdep
+        for (int i = 1; i < n; ++i) {
+            res_ptr[i] = (a[i] > res_ptr[i - 1]) ? a[i] : res_ptr[i - 1];
+        }
+
+        int cur_min = a[n - 1];
+        #pragma GCC ivdep
+        for (int i = n - 2; i >= 0; --i) {
+            if (res_ptr[i] > cur_min) {
+                res_ptr[i] = res_ptr[i + 1];
+            }
+            cur_min = (a[i] < cur_min) ? a[i] : cur_min;
+        }
+        
+        vector<int> out(n);
+        copy(res_ptr, res_ptr + n, out.begin());
+        return out;
+    }
+};
