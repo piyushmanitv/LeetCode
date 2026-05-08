@@ -1,0 +1,124 @@
+3629. Minimum Jumps to Reach End via Prime Teleportation
+Medium
+Topics
+premium lock icon
+Companies
+Hint
+You are given an integer array nums of length n.
+
+You start at index 0, and your goal is to reach index n - 1.
+
+From any index i, you may perform one of the following operations:
+
+Adjacent Step: Jump to index i + 1 or i - 1, if the index is within bounds.
+Prime Teleportation: If nums[i] is a prime number p, you may instantly jump to any index j != i such that nums[j] % p == 0.
+Return the minimum number of jumps required to reach index n - 1.
+
+
+
+
+
+
+
+class Solution {
+private:
+    static constexpr int MAXV = 1'000'000 + 1;
+
+    static const vector<int>& getSPF() {
+        static const vector<int> spf = []() {
+            vector<int> spf(MAXV, 0);
+            for (int i = 0; i < MAXV; ++i) spf[i] = i;
+            spf[0] = 0;
+            spf[1] = 1;
+
+            for (int i = 2; 1LL * i * i < MAXV; ++i) {
+                if (spf[i] == i) { 
+                    for (long long j = 1LL * i * i; j < MAXV; j += i) {
+                        if (spf[j] == j) spf[j] = i;
+                    }
+                }
+            }
+            return spf;
+        }();
+        return spf;
+    }
+
+    static bool isPrimeNum(int x, const vector<int>& spf) {
+        return x >= 2 && spf[x] == x;
+    }
+
+public:
+    int minJumps(vector<int>& nums) {
+        int n = nums.size();
+        if (n == 1) return 0;
+
+        const auto& spf = getSPF();
+
+        int maxNum = *max_element(nums.begin(), nums.end());
+
+        vector<char> primeSeen(maxNum + 1, false);
+        for (int x : nums) {
+            if (isPrimeNum(x, spf)) {
+                primeSeen[x] = true;
+            }
+        }
+
+        unordered_map<int, vector<int>> factorToIndices;
+        factorToIndices.reserve(n * 2);
+
+        for (int i = 0; i < n; ++i) {
+            int x = nums[i];
+            if (x == 1) continue;
+
+            while (x > 1) {
+                int p = spf[x];
+
+                if (p <= maxNum && primeSeen[p]) {
+                    factorToIndices[p].push_back(i);
+                }
+
+                while (x % p == 0) x /= p;
+            }
+        }
+
+        vector<int> dist(n, -1);
+        vector<char> usedPrime(maxNum + 1, false);
+        queue<int> q;
+
+        dist[0] = 0;
+        q.push(0);
+
+        while (!q.empty()) {
+            int i = q.front();
+            q.pop();
+
+            if (i == n - 1) return dist[i];
+
+            if (i - 1 >= 0 && dist[i - 1] == -1) {
+                dist[i - 1] = dist[i] + 1;
+                q.push(i - 1);
+            }
+
+            if (i + 1 < n && dist[i + 1] == -1) {
+                dist[i + 1] = dist[i] + 1;
+                q.push(i + 1);
+            }
+
+            int x = nums[i];
+            if (x <= maxNum && isPrimeNum(x, spf) && !usedPrime[x]) {
+                usedPrime[x] = true;
+                auto it = factorToIndices.find(x);
+                if (it != factorToIndices.end()) {
+                    for (int j : it->second) {
+                        if (dist[j] == -1) {
+                            dist[j] = dist[i] + 1;
+                            q.push(j);
+                        }
+                    }
+                }
+            }
+        }
+
+        return -1;
+    }
+};
