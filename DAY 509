@@ -1,0 +1,46 @@
+1674. Minimum Moves to Make Array Complementary
+Solved
+Medium
+Topics
+premium lock icon
+Companies
+Hint
+You are given an integer array nums of even length n and an integer limit. In one move, you can replace any integer from nums with another integer between 1 and limit, inclusive.
+
+The array nums is complementary if for all indices i (0-indexed), nums[i] + nums[n - 1 - i] equals the same number. For example, the array [1,2,3,4] is complementary because for all indices i, nums[i] + nums[n - 1 - i] = 5.
+
+Return the minimum number of moves required to make nums complementary.
+
+
+
+
+
+
+class Solution {
+public:
+    int minMoves(vector<int>& nums, int limit) {
+        int n = nums.size();
+        vector<int> delta((limit << 1) + 2, 0);
+
+        for (int i = 0; i < n >> 1; i++) {
+            int min = nums[i];
+            int max = nums[n - 1 - i];
+            if (min > max) swap(min, max);
+
+            delta[2] += 2;
+            delta[min + 1]--;
+            delta[min + max]--;
+            delta[min + max + 1]++;
+            delta[max + limit + 1]++;
+        }
+
+        int res = n, moves = 0;
+
+        for (int targ = 2; targ <= limit * 2; targ++) {
+            moves += delta[targ];
+            res = min(res, moves);
+        }
+
+        return res;
+    }
+};
