@@ -1,0 +1,56 @@
+3121. Count the Number of Special Characters II
+Solved
+Medium
+Topics
+premium lock icon
+Companies
+Hint
+You are given a string word. A letter c is called special if it appears both in lowercase and uppercase in word, and every lowercase occurrence of c appears before the first uppercase occurrence of c.
+
+Return the number of special letters in word.
+  
+  
+  
+  
+  
+  
+  
+  static const int _ = []() {
+    ios::sync_with_stdio(false);
+    cin.tie(nullptr);
+    return 0;
+}();
+
+class Solution {
+public:
+    int numberOfSpecialChars(string word)
+    {
+        vector<int> lower(26, INT_MAX);
+        bool count[26]={};
+        int res=0;
+
+        for (int i=0; i<word.size(); i++)
+        {
+            char c=word[i];
+
+            if (c>='a')
+                lower[c-'a']=i;
+
+        }
+
+        for (int i=0; i<word.size(); i++)
+        {
+            char c=word[i];
+
+            if (c<='Z')
+            {
+                if (i>lower[c-'A'] && !count[c-'A'])
+                    res++;
+                
+                count[c-'A']=true;
+            }
+        }
+        
+        return res;
+    }
+};
