@@ -1,0 +1,54 @@
+3753. Total Waviness of Numbers in Range II
+Solved
+Hard
+Topics
+premium lock icon
+Companies
+Hint
+You are given two integers num1 and num2 representing an inclusive range [num1, num2].
+
+The waviness of a number is defined as the total count of its peaks and valleys:
+
+A digit is a peak if it is strictly greater than both of its immediate neighbors.
+A digit is a valley if it is strictly less than both of its immediate neighbors.
+The first and last digits of a number cannot be peaks or valleys.
+Any number with fewer than 3 digits has a waviness of 0.
+Return the total sum of waviness for all numbers in the range [num1, num2].
+
+
+
+
+
+
+
+
+
+
+class Solution {
+public:
+    string s;
+    int n;
+    long long dp[17][10][3][2][2],pows[17]={1},suffix[17]={0};
+    long long rec(int i, int d, int p, bool f, bool t){
+        if(i == n) return 0;
+        if(dp[i][d][p][f][t]!=-1) return dp[i][d][p][f][t];
+        int x = 9;
+        if(!f) x = s[i]-'0';
+        long long res = 0;
+        for(int j = 0; j <= x; ++j)
+            res += ((j>d && p==2) || (j<d && p==1)) * ((f||(j!=x))*pows[n-i-1] + !(f||(j!=x))*(suffix[n-i-1]+1)) +  rec(i+1,j,(j!=d && t) * (1+(j<d)),f||(j!=x),t||j);
+        return dp[i][d][p][f][t]=res;
+    }
+    long long solve(long long num){
+        memset(dp,-1,sizeof(dp));
+        s = to_string(num);
+        for(int i = 1; i <= s.size(); ++i) pows[i] = 10*pows[i-1];
+        for(long long x=num,i=0; x; x/=10,++i)
+            suffix[i+1] = suffix[i] + (x%10)*pows[i];
+        n = s.size();
+        return rec(0,0,0,0,0);
+    }
+    long long totalWaviness(long long num1, long long num2) {
+        return solve(num2) - solve(num1-1);
+    }
+};
