@@ -1,0 +1,91 @@
+2196. Create Binary Tree From Descriptions
+Solved
+Medium
+Topics
+premium lock icon
+Companies
+Hint
+You are given a 2D integer array descriptions where descriptions[i] = [parenti, childi, isLefti] indicates that parenti is the parent of childi in a binary tree of unique values. Furthermore,
+
+If isLefti == 1, then childi is the left child of parenti.
+If isLefti == 0, then childi is the right child of parenti.
+Construct the binary tree described by descriptions and return its root.
+
+The test cases will be generated such that the binary tree is valid.
+
+
+
+
+
+
+
+
+/**
+ * Definition for a binary tree node.
+ * struct TreeNode {
+ *     int val;
+ *     TreeNode *left;
+ *     TreeNode *right;
+ *     TreeNode() : val(0), left(nullptr), right(nullptr) {}
+ *     TreeNode(int x) : val(x), left(nullptr), right(nullptr) {}
+ *     TreeNode(int x, TreeNode *left, TreeNode *right) : val(x), left(left), right(right) {}
+ * };
+ */
+class Solution {
+public:
+    TreeNode* createBinaryTree(vector<vector<int>>& descriptions) {
+
+        static const auto fast_io = [](){
+            std::ios::sync_with_stdio(false);
+            std::cin.tie(nullptr);
+            return nullptr;
+        }();
+
+        static TreeNode nodes[100001] = {};
+        static int is_child[100001] = { false };
+        static int generation[100001] = { 0 };
+        static int generation_id = 0;
+
+        ++generation_id;
+
+        for(const auto& v : descriptions){
+            const int parent = v[0], child = v[1];
+            const bool left_child = v[2];
+            if(generation[parent] != generation_id){
+                TreeNode* temp = &nodes[parent];
+                temp->left = temp->right = nullptr;
+                temp->val = parent;
+                generation[parent] = generation_id;
+            }
+            if(generation[child] != generation_id){
+                TreeNode* temp = &nodes[child];
+                temp->left = temp->right = nullptr;
+                temp->val = child;
+                generation[child] = generation_id;
+            }
+            TreeNode* parent_node = &nodes[parent];
+            TreeNode* child_node = &nodes[child];
+            if(left_child){
+                parent_node->left = child_node;
+            } else {
+                parent_node->right = child_node;
+            }
+            is_child[child] = true;
+        }
+        int root = -1;
+        for(const auto& v : descriptions){
+            const int parent = v[0];
+            if(!is_child[parent]){
+                root = parent;
+                break;
+            }
+        }
+        for(const auto& v : descriptions){
+            const int parent = v[0], child = v[1];
+            is_child[parent] = false;
+            is_child[child] = false;
+        }
+
+        return &nodes[root];
+    }
+};
