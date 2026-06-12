@@ -1,0 +1,124 @@
+3559. Number of Ways to Assign Edge Weights II
+Hard
+Topics
+premium lock icon
+Companies
+Hint
+There is an undirected tree with n nodes labeled from 1 to n, rooted at node 1. The tree is represented by a 2D integer array edges of length n - 1, where edges[i] = [ui, vi] indicates that there is an edge between nodes ui and vi.
+
+Initially, all edges have a weight of 0. You must assign each edge a weight of either 1 or 2.
+
+The cost of a path between any two nodes u and v is the total weight of all edges in the path connecting them.
+
+You are given a 2D integer array queries. For each queries[i] = [ui, vi], determine the number of ways to assign weights to edges in the path such that the cost of the path between ui and vi is odd.
+
+Return an array answer, where answer[i] is the number of valid assignments for queries[i].
+
+Since the answer may be large, apply modulo 109 + 7 to each answer[i].
+
+Note: For each query, disregard all edges not in the path between node ui and vi.
+
+
+
+
+
+
+
+
+
+
+const int MOD = 1e9 + 7;
+
+class Solution {
+    int n;
+    vector<vector<int>> g;
+    vector<vector<pair<int,int>>> q;
+    vector<int> lca, deep, uf;
+    vector<bool> vis;
+
+    int find(int x) {
+        while (uf[x] != x) {
+            uf[x] = uf[uf[x]];
+            x = uf[x];
+        }
+        return x;
+    }
+
+    void tarjan(int u, int parent) {
+        vis[u] = true;
+        for (int v : g[u]) {
+            if (v == parent) continue;
+            tarjan(v, u);
+            uf[v] = u;
+        }
+        for (auto [node, idx] : q[u]) {
+            if (vis[node]) lca[idx] = find(node);
+        }
+    }
+
+    void dfs(int u, int fa, int d) {
+        deep[u] = d;
+        for (int v : g[u]) {
+            if (v == fa) continue;
+            dfs(v, u, d + 1);
+        }
+    }
+
+    long long modpow(long long base, long long exp, long long mod) {
+        long long result = 1;
+        base %= mod;
+        while (exp > 0) {
+            if (exp & 1) result = result * base % mod;
+            base = base * base % mod;
+            exp >>= 1;
+        }
+        return result;
+    }
+
+public:
+    vector<int> assignEdgeWeights(vector<vector<int>>& edges, vector<vector<int>>& queries) {
+        n = edges.size() + 1;
+        g.assign(n + 1, {});
+        q.assign(n + 1, {});
+        lca.assign(queries.size(), 0);
+        deep.assign(n + 1, 0);
+        uf.resize(n + 1);
+        iota(uf.begin(), uf.end(), 0);
+        vis.assign(n + 1, false);
+
+        for (auto& e : edges) {
+            g[e[0]].push_back(e[1]);
+            g[e[1]].push_back(e[0]);
+        }
+        for (int i = 0; i < (int)queries.size(); i++) {
+            q[queries[i][0]].emplace_back(queries[i][1], i);
+            q[queries[i][1]].emplace_back(queries[i][0], i);
+        }
+
+        tarjan(1, 0);
+        dfs(1, 0, 0);
+
+        vector<int> ans(queries.size());
+        for (int i = 0; i < (int)queries.size(); i++) {
+            int x = deep[queries[i][0]] + deep[queries[i][1]] - 2 * deep[lca[i]];
+            ans[i] = (x == 0) ? 0 : modpow(2, x - 1, MOD);
+        }
+        return ans;
+    }
+};
+
+static constexpr size_t max_align = alignof(max_align_t);
+alignas(max_align) static unsigned char BUFFER[200 * 1024 * 1024];
+static size_t pos = 0;
+
+void *operator new(const size_t size) {
+    const size_t padding = (max_align - (pos % max_align)) % max_align;
+    pos += padding + size;
+    return static_cast<void *>(&BUFFER[pos - size]);
+}
+
+void *operator new[](const size_t size) { return operator new(size); }
+void operator delete(void *) noexcept {}
+void operator delete[](void *) noexcept {}
+void operator delete(void *, size_t) noexcept {}
+void operator delete[](void *, size_t) noexcept {} 
