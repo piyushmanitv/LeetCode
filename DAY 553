@@ -1,0 +1,62 @@
+3739. Count Subarrays With Majority Element II
+Hard
+Topics
+premium lock icon
+Companies
+Hint
+You are given an integer array nums and an integer target.
+
+Return the number of subarrays of nums in which target is the majority element.
+
+The majority element of a subarray is the element that appears strictly more than half of the times in that subarray.
+
+
+
+
+
+
+
+
+
+static constexpr int N=2e5+2;
+using ll=long long;
+int bit[2*N];// as global variable
+struct Fenwick{
+    int n;
+    Fenwick(unsigned n): n(n){
+        memset(bit, 0, (n+1)*sizeof(int));
+    }
+    void update(int idx, int val=1) {
+       for(int i=idx+1; i<=n; i+=i&-i) 
+        bit[i]+=val;
+    }
+    // range query
+    int query(int idx) {
+        int ans=0;
+        for (int i=idx+1; i>0; i-=i&-i)
+            ans+=bit[i];
+        return ans;
+    }
+};
+
+class Solution {
+public:
+    static long long countMajoritySubarrays(vector<int>& nums, int target) {
+        int n=nums.size(), bias=n+1, maxV=bias<<1;
+        Fenwick tree(maxV);
+        long long ans=0, sum=0;
+        tree.update(bias);
+        for (int x : nums) {
+            sum+=((x==target)<<1)-1;
+            ans+=tree.query(sum+bias-1);
+            tree.update(sum+bias);
+        }
+        return ans;
+    }
+};
+auto init = []() {
+    ios::sync_with_stdio(false);
+    cin.tie(nullptr);
+    cout.tie(nullptr);
+    return 'c';
+}();
