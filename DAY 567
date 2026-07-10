@@ -1,0 +1,71 @@
+3534. Path Existence Queries in a Graph II
+Hard
+Topics
+premium lock icon
+Companies
+Hint
+You are given an integer n representing the number of nodes in a graph, labeled from 0 to n - 1.
+
+You are also given an integer array nums of length n and an integer maxDiff.
+
+An undirected edge exists between nodes i and j if the absolute difference between nums[i] and nums[j] is at most maxDiff (i.e., |nums[i] - nums[j]| <= maxDiff).
+
+You are also given a 2D integer array queries. For each queries[i] = [ui, vi], find the minimum distance between nodes ui and vi. If no path exists between the two nodes, return -1 for that query.
+
+Return an array answer, where answer[i] is the result of the ith query.
+
+Note: The edges between the nodes are unweighted.
+
+
+
+
+
+
+
+
+
+
+class Solution {
+public:
+    vector<int> pathExistenceQueries(int n, vector<int>& nums, int maxDiff, vector<vector<int>>& queries) {
+        vector<pair<int, int>> newNums(n);
+        for (int i = 0; i < n; i++)
+            newNums[i] = {nums[i], i};
+        sort(newNums.begin(), newNums.end());
+
+        vector<int> getI(n);
+        for (int i = 0; i < n; i++)
+            getI[newNums[i].second] = i;
+
+        vector<vector<int>> st(n, vector<int>(18));
+
+        int r = 0;
+        for (int i = 0; i < n; i++) {
+            if (r < i) r = i;
+            while (r + 1 < n &&
+                   newNums[r + 1].first - newNums[r].first <= maxDiff &&
+                   newNums[r + 1].first - newNums[i].first <= maxDiff)
+                r++;
+            st[i][0] = r;
+        }
+
+        for (int j = 1; j < 18; j++)
+            for (int i = 0; i < n; i++)
+                st[i][j] = st[st[i][j - 1]][j - 1];
+
+        vector<int> ans(queries.size(), -1);
+        for (int i = 0; i < (int)queries.size(); i++) {
+            int a = getI[queries[i][0]];
+            int b = getI[queries[i][1]];
+            if (a > b) swap(a, b);
+            if (a == b) { ans[i] = 0; continue; }
+
+            int curr = a, steps = 0;
+            for (int j = 17; j >= 0; j--)
+                if (st[curr][j] < b) { curr = st[curr][j]; steps += (1 << j); }
+
+            ans[i] = (st[curr][0] >= b) ? steps + 1 : -1;
+        }
+        return ans;
+    }
+};
