@@ -1,0 +1,93 @@
+1331. Rank Transform of an Array
+Easy
+Topics
+premium lock icon
+Companies
+Hint
+Given an array of integers arr, replace each element with its rank.
+
+The rank represents how large the element is. The rank has the following rules:
+
+Rank is an integer starting from 1.
+The larger the element, the larger the rank. If two elements are equal, their rank must be the same.
+Rank should be as small as possible.
+
+
+
+
+
+
+
+
+
+
+
+struct SortSolution {
+    static vector<int> arrayRankTransform(vector<int>& arr) {
+        int n = (int)arr.size();
+        vector<int> idx(n);
+        iota(idx.begin(), idx.end(), 0);
+        sort(idx.begin(), idx.end(), [&](int a, int b) { return arr[a] < arr[b]; });
+
+        vector<int> ans(n);
+        int rank = 0;
+        for (int i = 0; i < n; i++) {
+            if (i == 0 || arr[idx[i]] != arr[idx[i - 1]]) rank++;
+            ans[idx[i]] = rank;
+        }
+        return ans;
+    }
+};
+
+struct RadixSolution {
+    static constexpr int DIGIT_BITS = 11;
+    static constexpr int NUM_BUCKETS = 1 << DIGIT_BITS;
+    static constexpr uint32_t DIGIT_MASK = NUM_BUCKETS - 1;
+
+    static vector<int> arrayRankTransform(vector<int>& arr) {
+        int n = (int)arr.size();
+
+        long xmin = *min_element(arr.begin(), arr.end());
+        long xmax = *max_element(arr.begin(), arr.end());
+        unsigned long max_offset = (unsigned long)(xmax - xmin);
+        int bitlen = max_offset == 0 ? 1 : (64 - countl_zero(max_offset));
+        int passes = max(1, (bitlen + DIGIT_BITS - 1) / DIGIT_BITS);
+
+        thread_local vector<pair<uint32_t, int>> nums_vec, tmp_vec;
+        if ((int)nums_vec.size() < n) nums_vec.resize(n);
+        if ((int)tmp_vec.size() < n) tmp_vec.resize(n);
+        pair<uint32_t, int>* nums = nums_vec.data();
+        pair<uint32_t, int>* tmp = tmp_vec.data();
+
+        for (int i = 0; i < n; i++) nums[i] = {(uint32_t)((long)arr[i] - xmin), i};
+
+        int count[NUM_BUCKETS + 1];
+        for (int p = 0; p < passes; p++) {
+            int shift = p * DIGIT_BITS;
+            memset(count, 0, sizeof(count));
+            for (int i = 0; i < n; i++) count[((nums[i].first >> shift) & DIGIT_MASK) + 1]++;
+            for (int b = 0; b < NUM_BUCKETS; b++) count[b + 1] += count[b];
+            for (int i = 0; i < n; i++) {
+                int b = (nums[i].first >> shift) & DIGIT_MASK;
+                tmp[count[b]++] = nums[i];
+            }
+            swap(nums, tmp);
+        }
+
+        vector<int> ans(n);
+        int rank = 0;
+        for (int i = 0; i < n; i++) {
+            if (i == 0 || nums[i].first != nums[i - 1].first) rank++;
+            ans[nums[i].second] = rank;
+        }
+        return ans;
+    }
+};
+
+class Solution {
+public:
+    static vector<int> arrayRankTransform(vector<int>& arr) {
+        if ((int)arr.size() < 1024) return SortSolution::arrayRankTransform(arr);
+        return RadixSolution::arrayRankTransform(arr);
+    }
+};
