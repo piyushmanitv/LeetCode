@@ -1,0 +1,55 @@
+3336. Find the Number of Subsequences With Equal GCD
+Solved
+Hard
+Topics
+premium lock icon
+Companies
+Hint
+You are given an integer array nums.
+
+Your task is to find the number of pairs of non-empty subsequences (seq1, seq2) of nums that satisfy the following conditions:
+
+The subsequences seq1 and seq2 are disjoint, meaning no index of nums is common between them.
+The GCD of the elements of seq1 is equal to the GCD of the elements of seq2.
+Return the total number of such pairs.
+
+Since the answer may be very large, return it modulo 109 + 7.
+
+
+
+
+
+
+
+
+
+
+class Solution {
+public:
+    int subsequencePairCount(vector<int>& nums) {
+        constexpr int MOD = 1000000007;
+        int M = *max_element(begin(nums), end(nums)) + 1;
+        vector<vector<int>> dp(M, vector<int>(M, 0));
+        dp[0][0] = 1;
+        for(auto x : nums) {
+            for(int i = 0; i < M; i++) {
+                for(int j = 0; j < M; j++) {
+                    int u = (i + 1)%M;
+                    int v = (j + 1)%M;
+                    int val = dp[u][v];
+                    if(!val) {
+                        continue;
+                    }
+                    (dp[gcd(u, x)][v] += val)%= MOD;
+                    (dp[u][gcd(v, x)] += val)%= MOD;
+                }
+            }
+        }
+
+        int ans = 0;
+        for(int x = 1; x < M; x++) {
+            ans = (ans + dp[x][x])%MOD;
+        }
+        return ans;
+    }
+};
