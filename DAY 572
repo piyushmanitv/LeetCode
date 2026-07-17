@@ -1,0 +1,64 @@
+3312. Sorted GCD Pair Queries
+Hard
+Topics
+premium lock icon
+Companies
+Hint
+You are given an integer array nums of length n and an integer array queries.
+
+Let gcdPairs denote an array obtained by calculating the GCD of all possible pairs (nums[i], nums[j]), where 0 <= i < j < n, and then sorting these values in ascending order.
+
+For each query queries[i], you need to find the element at index queries[i] in gcdPairs.
+
+Return an integer array answer, where answer[i] is the value at gcdPairs[queries[i]] for each query.
+
+The term gcd(a, b) denotes the greatest common divisor of a and b.
+
+
+
+
+
+
+
+
+
+
+class Solution {
+public:
+    vector<int> gcdValues(vector<int>& nums, vector<long long>& queries) {
+        int maxNum = *max_element(nums.begin(), nums.end());
+        long long cnt[maxNum + 1];
+        memset(cnt, 0, sizeof(cnt));
+        for (const int num: nums)
+            ++cnt[num];
+        for (int num = 1; num <= maxNum; num++) {
+            for (int i = num * 2; i <= maxNum; i += num)
+                cnt[num] += cnt[i];
+        }
+        for (int num = 1; num <= maxNum; num++)
+            cnt[num] = cnt[num] * (cnt[num] - 1) / 2;
+        for (int num = maxNum - 1; num >= 1; num--) {
+            for (int i = num * 2; i <= maxNum; i += num)
+                cnt[num] -= cnt[i];
+        }
+        for (int num = 2; num <= maxNum; num++)
+            cnt[num] += cnt[num - 1];
+
+        vector<int> res;
+        res.reserve(queries.size());
+        for (long long query: queries) {
+            ++query;
+            int l = 1, r = maxNum;
+            while (l < r) {
+                int m = l + (r - l) / 2;
+                if (cnt[m] >= query) {
+                    r = m;
+                } else {
+                    l = m + 1;
+                }
+            }
+            res.push_back(r);
+        }
+        return res;
+    }
+};
