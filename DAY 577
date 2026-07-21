@@ -1,0 +1,49 @@
+1081. Smallest Subsequence of Distinct Characters
+Solved
+Medium
+Topics
+premium lock icon
+Companies
+Hint
+Given a string s, return the lexicographically smallest subsequence of s that contains all the distinct characters of s exactly once.
+
+
+
+
+
+
+
+
+class Solution {
+public:
+    string smallestSubsequence(string s) {
+        int n = s.size();
+        vector<int> count(26);
+        vector<int> vis(26);
+        for(char i:s){
+            count[i-'a']++;
+        }
+
+        stack<char> st;
+        for(char i:s){
+            if(vis[i-'a']){
+                count[i-'a']--;
+                continue;
+            }
+            while(!st.empty() && st.top()>i && count[st.top()-'a']){
+                vis[st.top()-'a'] = 0;
+                st.pop();
+            }
+            st.push(i);
+            count[i-'a']--;
+            vis[i-'a'] =1;
+        }
+        string ans="";
+        while(!st.empty()){
+            ans+=st.top();
+            st.pop();
+        }
+        reverse(ans.begin(),ans.end());
+        return ans;
+    }
+};
