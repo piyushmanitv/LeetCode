@@ -1,0 +1,39 @@
+90. Subsets II
+Medium
+Topics
+premium lock icon
+Companies
+Given an integer array nums that may contain duplicates, return all possible subsets (the power set).
+
+The solution set must not contain duplicate subsets. Return the solution in any order.
+
+
+
+
+
+
+
+class Solution {
+public:
+    void give(int i,vector<int>& nums,int n,set<vector<int>>&ans,vector<int>&res){
+        if(i==n){
+            ans.insert(res);
+            return;
+        }
+        res.push_back(nums[i]);
+        give(i+1,nums,n,ans,res);
+        res.pop_back();
+        give(i+1,nums,n,ans,res);
+    }
+    vector<vector<int>> subsetsWithDup(vector<int>& nums) {
+        sort(nums.begin(),nums.end());
+        set<vector<int>>ans;
+        vector<int>res;
+        vector<vector<int>>d;
+        int n=nums.size();
+        give(0,nums,n,ans,res);
+        
+        for(auto x:ans) d.push_back(x);
+        return d;
+    }
+};
