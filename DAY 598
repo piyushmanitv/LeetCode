@@ -1,0 +1,39 @@
+1510. Stone Game IV
+Hard
+Topics
+premium lock icon
+Companies
+Hint
+Alice and Bob take turns playing a game, with Alice starting first.
+
+Initially, there are n stones in a pile. On each player's turn, that player makes a move consisting of removing any non-zero square number of stones in the pile.
+
+Also, if a player cannot make a move, he/she loses the game.
+
+Given a positive integer n, return true if and only if Alice wins the game otherwise return false, assuming both players play optimally.
+
+
+
+
+
+
+
+
+
+class Solution {
+public:
+    static constexpr int MAX = 100000;
+    inline static bitset<MAX + 1> dp;
+
+    inline static bool init = []() {
+        for (int i = 0; i <= MAX; i++) {
+            if (dp.test(i)) continue;
+            for (int j = 1; j * j <= MAX - i; j++)
+                dp.set(i + j * j);
+        }
+        
+        return false;
+    }();
+
+    bool winnerSquareGame(int n) { return dp.test(n); }
+};
