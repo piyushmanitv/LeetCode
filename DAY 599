@@ -1,0 +1,48 @@
+2996. Smallest Missing Integer Greater Than Sequential Prefix Sum
+Easy
+Topics
+premium lock icon
+Companies
+Hint
+You are given a 0-indexed array of integers nums.
+
+A prefix nums[0..i] is sequential if, for all 1 <= j <= i, nums[j] = nums[j - 1] + 1. In particular, the prefix consisting only of nums[0] is sequential.
+
+Return the smallest integer x missing from nums such that x is greater than or equal to the sum of the longest sequential prefix.
+
+
+
+
+
+
+
+
+
+  class Solution {
+public:
+    int missingInteger(vector<int>& nums) {
+        int sequentialSum = nums[0];
+        int n = nums.size();
+        vector<bool> freq(1276, 0);
+        freq[nums[0]]=1;
+        for (int i = 1; i < n; i++) {
+            if (nums[i] == nums[i - 1] + 1) {
+                sequentialSum += nums[i];
+                freq[nums[i]] = 1;
+            } else {
+                while (i < n) {
+                    freq[nums[i]] = 1;
+                    i++;
+                }
+            }
+        }
+        int ans;
+        for (int i = sequentialSum; i < 1277; i++) {
+            if (freq[i] == 0) {
+                ans = i;
+                break;
+            }
+        }
+        return ans;
+    }
+};
