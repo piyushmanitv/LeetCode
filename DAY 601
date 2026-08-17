@@ -1,0 +1,56 @@
+2213. Longest Substring of One Repeating Character
+Solved
+Hard
+Topics
+premium lock icon
+Companies
+Hint
+You are given a 0-indexed string s. You are also given a 0-indexed string queryCharacters of length k and a 0-indexed array of integer indices queryIndices of length k, both of which are used to describe k queries.
+
+The ith query updates the character in s at index queryIndices[i] to the character queryCharacters[i].
+
+Return an array lengths of length k where lengths[i] is the length of the longest substring of s consisting of only one repeating character after the ith query is performed.
+
+
+
+
+
+
+
+
+
+
+
+
+class Solution {
+public:
+    vector<int> longestRepeating(string& s, string& qc, vector<int>& qi) {
+        constexpr uint32_t M = bit_ceil(100'000u);
+        static struct seg_t {
+            uint32_t l, r, x;
+            char lc, rc;
+        } seg[M * 2];
+        constexpr auto merge = [](seg_t a, seg_t b, uint32_t len) {
+            return seg_t {
+                a.l + (a.rc == b.lc & a.l == len) * b.l,
+                b.r + (a.rc == b.lc & b.r == len) * a.r,
+                max(max(a.x, b.x), (a.rc == b.lc) * (a.r + b.l)),
+                a.lc,
+                b.rc
+            };
+        };
+        uint32_t n = s.size(), m = bit_ceil(n);
+        for (uint32_t i = 0; i < n; ++i)
+            seg[m + i] = {1, 1, 1, s[i], s[i]};
+        fill_n(seg + m + n, m - n, seg_t{});
+        for (uint32_t i = m - 1; i; --i)
+            seg[i] = merge(seg[i * 2], seg[i * 2 + 1], m / bit_floor(i) / 2);
+        for (auto [pos, chr]: views::zip(qi, qc)) {
+            seg[m + pos].lc = seg[m + pos].rc = chr;
+            for (uint32_t i = (m + pos) / 2; i; i /= 2)
+                seg[i] = merge(seg[i * 2], seg[i * 2 + 1], m / bit_floor(i) / 2);
+            pos = seg[1].x;
+        }
+        return std::move(qi);
+    }
+};
