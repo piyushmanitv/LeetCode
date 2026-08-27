@@ -1,0 +1,74 @@
+3720. Lexicographically Smallest Permutation Greater Than Target
+Medium
+Topics
+premium lock icon
+Companies
+Hint
+You are given two strings s and target, both having length n, consisting of lowercase English letters.
+
+Return the lexicographically smallest permutation of s that is strictly greater than target. If no permutation of s is lexicographically strictly greater than target, return an empty string.
+
+A string a is lexicographically strictly greater than a string b (of the same length) if in the first position where a and b differ, string a has a letter that appears later in the alphabet than the corresponding letter in b.
+
+
+
+
+
+
+
+
+
+  class Solution {
+public:
+    string lexGreaterPermutation(string s, string target) {
+        int n = s.length();
+
+        vector<int> cnt(26, 0);
+        for (char c : s) {
+            cnt[c - 'a']++;
+        }
+        string res = string(n, ' ');
+
+        int i = 0;
+        while (i < n) {
+            char t_char = target[i];
+            if (cnt[t_char - 'a'] > 0) {
+                res[i] = t_char;
+                cnt[t_char - 'a']--;
+                i++;
+            } else {
+                break;
+            }
+        }
+        int limit = (i == n) ? n - 1 : i;
+        for (int curr = limit; curr >= 0; curr--) {
+            if (res[curr] != ' ') {
+                cnt[res[curr] - 'a']++;
+                res[curr] = ' '; 
+            }
+            char target_char = target[curr];
+            int choice = -1;
+            for (int c = (target_char - 'a') + 1; c < 26; c++) {
+                if (cnt[c] > 0) {
+                    choice = c;
+                    break; 
+                }
+            }
+            if (choice != -1) {
+                res[curr] = (char)('a' + choice);
+                cnt[choice]--;
+
+                int write_idx = curr + 1;
+                for (int c = 0; c < 26; c++) {
+                    while (cnt[c] > 0) {
+
+                        res[write_idx++] = (char)('a' + c);
+                        cnt[c]--;
+                    }
+                }
+                return res; 
+            }
+        }
+        return "";
+    }
+};
