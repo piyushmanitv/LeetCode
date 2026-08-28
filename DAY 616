@@ -1,0 +1,48 @@
+Minimum Cost Selection
+Solved
+Difficulty: MediumAccuracy: 50.75%Submissions: 12K+Points: 4Average Time: 15m
+Given an n × 3 matrix mat[][], where each row represents the costs of three available choices at a shop, select exactly one choice from each row such that the same choice is not selected in two adjacent rows.
+
+Return the minimum total cost required.
+
+
+
+
+
+
+
+
+class Solution {
+	public:
+	int solve(int row, int col, vector<vector<int>> & dp,
+	const int& n,
+	const vector<vector<int>> & mat) {
+		if (row >= n || col >= 3)
+			return INT_MAX;
+
+		if (row == n - 1)
+			return mat[row][col];
+
+		if (dp[row][col] != INT_MAX)
+			return dp[row][col];
+
+		int ans = INT_MAX;
+		for (int c = 0; c<3; c++) {
+			if (c == col)
+				continue;
+			ans = min(ans, solve(row + 1, c, dp, n, mat));
+		}
+
+		return dp[row][col] = mat[row][col] + ans;
+	}
+	int minCost(vector<vector<int>> & mat) {
+		// code here
+		int n = mat.size();
+		vector<vector<int>> dp(n, vector<int>(3, INT_MAX));
+		int ans = INT_MAX;
+		for (int i = 0; i<3; i++) {
+			ans = min(ans, solve(0, i, dp, n, mat));
+		}
+		return ans;
+	}
+};
