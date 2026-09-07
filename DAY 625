@@ -1,0 +1,36 @@
+940. Distinct Subsequences II
+Hard
+Topics
+premium lock icon
+Companies
+Given a string s, return the number of distinct non-empty subsequences of s. Since the answer may be very large, return it modulo 109 + 7.
+
+A subsequence of a string is a new string that is formed from the original string by deleting some (can be none) of the characters without disturbing the relative positions of the remaining characters. (i.e., "ace" is a subsequence of "abcde" while "aec" is not
+
+
+
+
+
+
+
+
+
+
+
+class Solution {
+    static constexpr int MOD = 1e9 + 7;
+
+public:
+    int distinctSubseqII(string s) {
+        int tot = 0, dp[26]{};
+
+        for (auto& c : s) {
+            c -= 'a';
+            int add = (tot - dp[c] + MOD) % MOD;
+            dp[c] = 1 + tot;
+            tot = (dp[c] + add) % MOD;
+        }
+
+        return tot;
+    }
+};
