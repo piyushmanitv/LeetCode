@@ -1,0 +1,75 @@
+835. Image Overlap
+Medium
+Topics
+premium lock icon
+Companies
+You are given two images, img1 and img2, represented as binary, square matrices of size n x n. A binary matrix has only 0s and 1s as values.
+
+We translate one image however we choose by sliding all the 1 bits left, right, up, and/or down any number of units. We then place it on top of the other image. We can then calculate the overlap by counting the number of positions that have a 1 in both images.
+
+Note also that a translation does not include any kind of rotation. Any 1 bits that are translated outside of the matrix borders are erased.
+
+Return the largest possible overlap.
+
+
+
+
+
+
+
+
+
+class Solution {
+    static void print_imgs(const vector<uint32_t>& img1, const vector<uint32_t>& img2, const size_t extent)
+    {
+        for (const auto row : img1)
+            println(cout, "{:0{}b}", row, extent);
+
+        cout << endl;
+
+        for (const auto row : img2)
+            println(cout, "{:0{}b}", row, extent);
+    }
+
+public:
+    int largestOverlap(vector<vector<int>>& img1, vector<vector<int>>& img2)
+    {
+        const int extent = img1.size();
+
+        vector<uint32_t> bits1(extent);
+        vector<uint32_t> bits2(extent);
+
+        for (int row = 0; row < extent; ++row)
+            for (int col = extent - 1; col >= 0; --col) {
+                bits1[row] = (bits1[row] << 1) | img1[row][col];
+                bits2[row] = (bits2[row] << 1) | img2[row][col];
+            }
+
+        int max_overlap = 0;
+
+        for (int dx = -extent + 1; dx < extent; ++dx)
+            for (int dy = -extent + 1; dy < extent; ++dy) {
+
+                int current_overlap = 0;
+
+                for (int r1_idx = 0; r1_idx < extent; ++r1_idx) {
+                    const int r2_idx = r1_idx + dy;
+                    if (r2_idx < 0 || r2_idx >= extent)
+                        continue;
+
+                    auto r1 = bits1[r1_idx]; 
+                    const auto r2 = bits2[r2_idx]; 
+                    if (dx >= 0)
+                        r1 >>= dx;
+                    else
+                        r1 <<= -dx;
+
+                    current_overlap += popcount(r1 & r2);
+                }
+                
+                max_overlap = max(max_overlap, current_overlap);
+            }
+
+        return max_overlap;
+    }
+};
