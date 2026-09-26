@@ -1,0 +1,96 @@
+1807. Evaluate the Bracket Pairs of a String
+Medium
+Topics
+premium lock icon
+Companies
+Hint
+You are given a string s that contains some bracket pairs, with each pair containing a non-empty key.
+
+For example, in the string "(name)is(age)yearsold", there are two bracket pairs that contain the keys "name" and "age".
+You know the values of a wide range of keys. This is represented by a 2D string array knowledge where each knowledge[i] = [keyi, valuei] indicates that key keyi has a value of valuei.
+
+You are tasked to evaluate all of the bracket pairs. When you evaluate a bracket pair that contains some key keyi, you will:
+
+Replace keyi and the bracket pair with the key's corresponding valuei.
+If you do not know the value of the key, you will replace keyi and the bracket pair with a question mark "?" (without the quotation marks).
+Each key will appear at most once in your knowledge. There will not be any nested brackets in s.
+
+Return the resulting string after evaluating all of the bracket pairs.
+
+
+
+
+
+
+
+
+
+struct TrieNode {
+    TrieNode* next[26]; // 'a'-'z'
+    int idx=-1;
+};
+static constexpr int N=1e6+1;  
+static TrieNode pool[N];
+static int ptr=0;   // node counter
+struct Trie {
+    TrieNode* newNode() {
+        TrieNode* node=&pool[ptr++];
+        memset(node->next, 0, sizeof(node->next));
+        node->idx=-1;
+        return node;
+    }
+    TrieNode* root;
+    Trie(){
+        ptr=0; // reset the counter
+        root=newNode();
+    }
+    void insert(string_view word, int id) {
+        TrieNode* Node=root;
+        for(char c: word){
+            int i=c-'a';
+            if(Node->next[i]==NULL)
+                Node->next[i]=newNode();
+            Node=Node->next[i];
+        }
+        Node->idx=id;
+    }
+    
+    int search(string_view s) {
+        TrieNode* Node=root;
+        for(char c : s){
+            int i=c-'a';
+            if(Node->next[i]==NULL) return -1;
+            Node=Node->next[i];
+        }
+        return Node->idx;
+    }
+};
+class Solution {
+public:
+    string evaluate(string& s, vector<vector<string>>& knowledge) {
+        const int n=s.size(), m=knowledge.size();
+        Trie trie;
+        for(int i=0; i<m; i++)
+            trie.insert(knowledge[i][0], i);
+
+        string t;
+        t.reserve(n);
+        for(int i=0; i<n; i++){
+            while(i<n && s[i]>='a')
+                t+=s[i++];
+            if (i==n) break;
+
+            if (s[i]=='('){
+                int l=i++, r;
+                while(i<n && s[i]>='a') i++;
+                if (s[i]==')') r=i;
+                string key=s.substr(l+1, r-l-1);
+                int id=trie.search(key);
+                if (id!=-1)
+                    t+=knowledge[id][1];
+                else t+='?';
+            }
+        }
+        return t;
+    }
+};
