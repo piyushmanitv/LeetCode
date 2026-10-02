@@ -1,0 +1,72 @@
+2267. Check if There Is a Valid Parentheses String Path
+Solved
+Hard
+Topics
+premium lock icon
+Companies
+Hint
+A parentheses string is a non-empty string consisting only of '(' and ')'. It is valid if any of the following conditions is true:
+
+It is ().
+It can be written as AB (A concatenated with B), where A and B are valid parentheses strings.
+It can be written as (A), where A is a valid parentheses string.
+You are given an m x n matrix of parentheses grid. A valid parentheses string path in the grid is a path satisfying all of the following conditions:
+
+The path starts from the upper left cell (0, 0).
+The path ends at the bottom-right cell (m - 1, n - 1).
+The path only ever moves down or right.
+The resulting parentheses string formed by the path is valid.
+Return true if there exists a valid parentheses string path in the grid. Otherwise, return false.
+
+
+
+
+
+
+
+
+
+
+class Solution {
+public:
+    int interleaveCharacters(string word1, string word2, string target) {
+        int MOD = 1e9 + 7;
+        int n = word1.size(), m = word2.size(), t = target.size();
+        
+        vector<vector<vector<long long>>> dp(n + 1, vector<vector<long long>>(m + 1, vector<long long>(t + 1, 0)));
+
+        for (int i = 0; i <= n; i++) {
+            for (int j = 0; j <= m; j++) {
+                dp[i][j][0] = 1;
+            }
+        }
+
+        for (int k = 1; k <= t; k++) {
+            for (int i = 0; i <= n; i++) {
+                for (int j = 0; j <= m; j++) {
+                    long long val = 0;
+                    
+                    if (i > 0) val = (val + dp[i-1][j][k]) % MOD;
+                    if (j > 0) val = (val + dp[i][j-1][k]) % MOD;
+                    if (i > 0 && j > 0) val = (val - dp[i-1][j-1][k] + MOD) % MOD;
+                    
+                    if (i > 0 && word1[i-1] == target[k-1]) {
+                        long long add = dp[i-1][j][k-1];
+                        if (j > 0) add = (add - dp[i-1][j-1][k-1] + MOD) % MOD;
+                        val = (val + add) % MOD;
+                    }
+                    if (j > 0 && word2[j-1] == target[k-1]) {
+                        long long add = dp[i][j-1][k-1];
+                        if (i > 0) add = (add - dp[i-1][j-1][k-1] + MOD) % MOD;
+                        val = (val + add) % MOD;
+                    }
+                    
+                    dp[i][j][k] = val;
+                }
+            }
+        }
+        long long ans = (dp[n][m][t] - dp[n][0][t] - dp[0][m][t]) % MOD;
+        
+        return (ans + 2 * MOD) % MOD;
+    }
+};
