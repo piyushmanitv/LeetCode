@@ -1,0 +1,44 @@
+678. Valid Parenthesis String
+Medium
+Topics
+premium lock icon
+Companies
+Hint
+Given a string s containing only three types of characters: '(', ')' and '*', return true if s is valid.
+
+The following rules define a valid string:
+
+Any left parenthesis '(' must have a corresponding right parenthesis ')'.
+Any right parenthesis ')' must have a corresponding left parenthesis '('.
+Left parenthesis '(' must go before the corresponding right parenthesis ')'.
+'*' could be treated as a single right parenthesis ')' or a single left parenthesis '(' or an empty string "".
+
+
+
+
+
+
+
+
+
+  class Solution {
+public:
+    bool checkValidString(string s) {
+        int low = 0, high = 0;
+        for (char c : s) {
+            if (c == '(') {
+                low++;
+                high++;
+            } else if (c == ')') {
+                low--;
+                high--;
+            } else {
+                low--;
+                high++;
+            }
+            if (high < 0) return false;
+            if (low < 0) low = 0;
+        }
+        return low == 0;
+    }
+};
