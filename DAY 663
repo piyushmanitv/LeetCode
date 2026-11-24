@@ -1,0 +1,77 @@
+3505. Minimum Operations to Make Elements Within K Subarrays Equal
+Hard
+Topics
+premium lock icon
+Companies
+Hint
+You are given an integer array nums and two integers, x and k. You can perform the following operation any number of times (including zero):
+
+Increase or decrease any element of nums by 1.
+Return the minimum number of operations needed to have at least k non-overlapping subarrays of size exactly x in nums, where all elements within each subarray are equal.
+
+
+
+
+
+
+
+
+
+
+
+#ifdef LC_DEBUG
+#define KN static
+#define KT static
+#else
+#define KN __attribute__((noinline, no_sanitize("address", "undefined"))) static
+#define KT __attribute__((noinline, no_sanitize("address", "undefined"), target("popcnt,bmi,bmi2,lzcnt,avx2"))) static
+#endif
+#ifdef LC_DEBUG
+#define KI static inline
+#else
+#define KI __attribute__((always_inline, no_sanitize("address", "undefined"))) static inline
+#endif 
+typedef unsigned long long u64_3505;
+KI void set3505(u64_3505* L0, u64_3505* L1, int r) { L0[r >> 6] |= 1ULL << (r & 63); L1[r >> 12] |= 1ULL << ((r >> 6) & 63); }
+KI void clr3505(u64_3505* L0, u64_3505* L1, int r) { if (!(L0[r >> 6] &= ~(1ULL << (r & 63)))) L1[r >> 12] &= ~(1ULL << ((r >> 6) & 63)); }
+KI int next3505(const u64_3505* L0, const u64_3505* L1, int r) { 
+    int q = r + 1, w = q >> 6; u64_3505 b = L0[w] & (~0ULL << (q & 63)); if (b) return (w << 6) | __builtin_ctzll(b);
+    int w1 = (w + 1) >> 6; u64_3505 c = (w + 1) & 63 ? L1[w1] & (~0ULL << ((w + 1) & 63)) : L1[w1];
+    while (!c) c = L1[++w1];
+    int ww = (w1 << 6) | __builtin_ctzll(c); return (ww << 6) | __builtin_ctzll(L0[ww]);
+}
+KI int prev3505(const u64_3505* L0, const u64_3505* L1, int r) {  
+    int q = r - 1, w = q >> 6; u64_3505 b = L0[w] & ((q & 63) == 63 ? ~0ULL : (2ULL << (q & 63)) - 1); if (b) return (w << 6) | (63 - __builtin_clzll(b));
+    int w1 = (w - 1) >> 6; int e = (w - 1) & 63; u64_3505 c = w - 1 < 0 ? 0 : L1[w1] & (e == 63 ? ~0ULL : (2ULL << e) - 1);
+    while (!c) c = L1[--w1];
+    int ww = (w1 << 6) | (63 - __builtin_clzll(c)); return (ww << 6) | (63 - __builtin_clzll(L0[ww]));
+}
+KN long long kern3505(const int* a, int n, int x, int k, int* ord, int* tmp, int* rk, int* vr, u64_3505* L0, u64_3505* L1, long long* w, long long* d0, long long* d1) {
+    int C[2048];
+    for (int i = 0; i < 2048; ++i) C[i] = 0; for (int i = 0; i < n; ++i) ++C[(a[i] + 1000000) & 2047];
+    for (int i = 0, s = 0; i < 2048; ++i) { int c = C[i]; C[i] = s; s += c; }
+    for (int i = 0; i < n; ++i) tmp[C[(a[i] + 1000000) & 2047]++] = i;
+    for (int i = 0; i < 2048; ++i) C[i] = 0; for (int i = 0; i < n; ++i) ++C[(a[i] + 1000000) >> 11];
+    for (int i = 0, s = 0; i < 2048; ++i) { int c = C[i]; C[i] = s; s += c; }
+    for (int t = 0; t < n; ++t) { int i = tmp[t]; ord[C[(a[i] + 1000000) >> 11]++] = i; }
+    for (int r = 0; r < n; ++r) { rk[ord[r]] = r; vr[r] = a[ord[r]]; }
+    int m = (x + 1) / 2, med = -1, cnt = 0; long long S = 0, low = 0;
+    for (int i = 0; i < x; ++i) { set3505(L0, L1, rk[i]); S += a[i]; }
+    for (int st = 0;; ++st) {
+        while (cnt < m) { med = next3505(L0, L1, med); ++cnt; low += vr[med]; }
+        while (cnt > m) { low -= vr[med]; --cnt; med = prev3505(L0, L1, med); }
+        if (!(L0[med >> 6] >> (med & 63) & 1)) med = prev3505(L0, L1, med);
+        long long v = vr[med]; w[st] = v * m - low + (S - low) - v * (x - m);
+        if (st + x >= n) break;
+        int r = rk[st]; clr3505(L0, L1, r); S -= a[st]; if (r <= med) { --cnt; low -= vr[r]; }
+        r = rk[st + x]; set3505(L0, L1, r); S += a[st + x]; if (r <= med) { ++cnt; low += vr[r]; } }
+    const long long INF = LLONG_MAX / 4;
+    for (int i = 0; i <= n; ++i) d0[i] = 0;
+    for (int j = 1; j <= k; ++j) { for (int i = 0; i < j * x; ++i) d1[i] = INF;
+        for (int i = j * x; i <= n; ++i) { long long v = d1[i - 1], u = d0[i - x] + w[i - x]; d1[i] = u < v ? u : v; }
+        long long* t = d0; d0 = d1; d1 = t; }
+    return d0[n];
+}
+class Solution { public: long long minOperations(vector<int>& nums, int x, int k) {
+    int n = (int)nums.size(), W0 = (n + 63) / 64 + 1, W1 = (W0 + 63) / 64 + 1; vector<int> ord(n), tmp(n), rk(n), vr(n); vector<u64_3505> L0(W0), L1(W1); vector<long long> w(n), d0(n + 1), d1(n + 1);
+    return kern3505(nums.data(), n, x, k, ord.data(), tmp.data(), rk.data(), vr.data(), L0.data(), L1.data(), w.data(), d0.data(), d1.data()); } };
