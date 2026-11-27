@@ -1,0 +1,24 @@
+Count Edges in Graph
+Difficulty: EasyAccuracy: 79.92%Submissions: 5K+Points: 2
+Given an undirected graph with V vertices numbered from 0 to V - 1, represented by an adjacency list adj[][], where adj[i] contains the vertices adjacent to vertex i.
+
+Return the total number of edges present in the graph.
+
+
+
+
+
+
+
+
+class Solution {
+  public:
+    int countEdges(vector<vector<int>> &adj) {
+      // code here
+      int edgesCnt = 0;
+      for (auto nodes : adj) {
+        edgesCnt += nodes.size();
+      }
+      return edgesCnt >> 1;
+    }
+};
